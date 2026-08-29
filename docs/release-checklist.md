@@ -25,9 +25,10 @@ stati verificati manualmente.
 ## Distribuzione
 
 - [ ] Artifact sottoposto a scansione antivirus.
-- [ ] Hash SHA-256 registrato nelle note della release.
+- [ ] Hash SHA-256 allegato automaticamente alla release e verificato sullo ZIP scaricato.
 - [ ] Firma del codice applicata, oppure assenza della firma dichiarata.
 - [ ] Draft release revisionata manualmente prima della pubblicazione.
 
 Il workflow associato ai tag `v*` crea deliberatamente una release in stato
-**draft**. La pubblicazione resta sempre un'azione manuale.
+**draft**. Lo ZIP e il relativo file `.sha256` vengono allegati insieme; la
+pubblicazione resta sempre un'azione manuale.
