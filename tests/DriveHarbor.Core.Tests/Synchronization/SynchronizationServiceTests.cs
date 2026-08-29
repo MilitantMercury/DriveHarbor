@@ -47,6 +47,30 @@ public sealed class SynchronizationServiceTests
     }
 
     [Fact]
+    public async Task LowDestinationSpaceStopsBeforeRobocopy()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var mountedRoot = temporaryDirectory.CreateDirectory("Mounted");
+        temporaryDirectory.CreateDirectory(Path.Combine("Mounted", "Source"));
+        var oneDrive = temporaryDirectory.CreateDirectory("OneDrive");
+        var destination = temporaryDirectory.CreateDirectory(Path.Combine("OneDrive", "Backup"));
+        var runner = new StubRobocopyRunner();
+        var service = CreateService(
+            [CreateVolume(mountedRoot)],
+            [oneDrive],
+            runner,
+            new StubDiskSpaceProvider(1024));
+
+        var result = await service.SynchronizeAsync(
+            CreateSettings(@"Z:\Source", destination, SyncMode.Backup),
+            mirrorConfirmed: false);
+
+        Assert.Equal(SynchronizationStatus.DestinationUnavailable, result.Status);
+        Assert.Contains("Spazio insufficiente", result.UserMessage, StringComparison.Ordinal);
+        Assert.Null(runner.LastRequest);
+    }
+
+    [Fact]
     public async Task MirrorRequiresConfirmationBeforePreflightOrProcessStart()
     {
         var runner = new StubRobocopyRunner();
@@ -114,11 +138,13 @@ public sealed class SynchronizationServiceTests
     private static SynchronizationService CreateService(
         IReadOnlyList<VolumeDescriptor> volumes,
         IReadOnlyList<string> oneDriveRoots,
-        StubRobocopyRunner runner) => new(
+        StubRobocopyRunner runner,
+        IDiskSpaceProvider? diskSpaceProvider = null) => new(
             new DriveDetectionService(new StubVolumeCatalog(volumes)),
             new PathSafetyValidator(new StubOneDriveRootProvider(oneDriveRoots)),
             runner,
-            new StubLogger());
+            new StubLogger(),
+            diskSpaceProvider);
 
     private static AppSettings CreateSettings(string source, string destination, SyncMode mode) =>
         AppSettings.CreateDefault() with
@@ -176,6 +202,11 @@ public sealed class SynchronizationServiceTests
             LogLevel level,
             string message,
             CancellationToken cancellationToken = default) => Task.CompletedTask;
+    }
+
+    private sealed class StubDiskSpaceProvider(long? availableBytes) : IDiskSpaceProvider
+    {
+        public long? GetAvailableBytes(string path) => availableBytes;
     }
 
     private sealed record ValidContext(

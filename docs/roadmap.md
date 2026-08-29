@@ -26,10 +26,10 @@ risultati, output in tempo reale, annullamento e file di log con retention.
 Dashboard, pagina Impostazioni, log in tempo reale, annullamento, anteprima e
 doppia conferma Mirror con messaggi orientati agli utenti non tecnici.
 
-## 6. V1 hardening
+## 6. V1 hardening — completata
 
-Scenari di errore, test end-to-end su directory temporanee, packaging,
-documentazione finale e release candidate.
+Scenari di errore, preflight spazio, packaging, documentazione finale e workflow
+di draft release. La pubblicazione resta subordinata alla checklist manuale.
 
 ## Dopo la V1
 

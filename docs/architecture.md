@@ -62,6 +62,11 @@ La UI riceverà messaggi comprensibili e non i dettagli tecnici del codice.
 `DailyFileLogger` serializza le scritture, neutralizza newline inserite nei
 messaggi e applica retention temporale, limite per file e limite complessivo.
 
+`WindowsDiskSpaceProvider` verifica la destinazione prima di ogni processo. La
+soglia conservativa di 256 MB non sostituisce il controllo di Robocopy: gli
+errori successivi vengono classificati da `RobocopyFailureClassifier` usando
+codici e testi comuni sia inglesi sia italiani.
+
 ## Desktop
 
 `DriveHarbor.App` usa MVVM leggero senza container o framework esterni.

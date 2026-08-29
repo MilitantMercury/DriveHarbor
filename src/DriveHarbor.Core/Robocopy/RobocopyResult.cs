@@ -6,4 +6,5 @@ public sealed record RobocopyResult(
     string UserMessage,
     RobocopySummary Summary,
     IReadOnlyList<string> Output,
-    IReadOnlyList<string> Errors);
+    IReadOnlyList<string> Errors,
+    RobocopyFailureKind FailureKind = RobocopyFailureKind.None);
