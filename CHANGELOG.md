@@ -16,6 +16,7 @@ Il progetto segue il versionamento semantico.
 - Preflight dello spazio libero e classificazione degli errori comuni.
 - Build e draft release self-contained Windows x64 tramite GitHub Actions.
 - Test d'integrazione reali Backup/Mirror su directory temporanee sacrificabili.
+- Checksum SHA-256 automatico allegato ai pacchetti delle draft release.
 
 ### Security
 

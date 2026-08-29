@@ -168,8 +168,10 @@ La pipeline GitHub Actions esegue restore, build, test e produce un artifact
 self-contained per Windows x64. La pubblicazione non è ancora una release
 firmata né un installer.
 
-I tag `v*` avviano un secondo workflow che crea archivio ZIP e GitHub Release in
-stato **draft**. La release deve essere revisionata usando la
+I tag `v*` avviano un secondo workflow che crea archivio ZIP, checksum SHA-256 e
+GitHub Release in stato **draft**. Il checksum viene allegato come file
+`DriveHarbor-<versione>-win-x64.zip.sha256` e può essere verificato con
+`Get-FileHash`. La release deve essere revisionata usando la
 [checklist](docs/release-checklist.md) e pubblicata manualmente.
 
 ## Struttura
