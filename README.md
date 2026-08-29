@@ -23,7 +23,7 @@ richiede account aggiuntivi, non include telemetria e non invia dati all'esterno
 
 ## Stato del progetto
 
-La versione corrente è `0.1.0`. Sono disponibili la foundation tecnica, il
+La versione corrente è `1.0.0-beta.1`. Sono disponibili la foundation tecnica, il
 modello di configurazione locale e le regole di sicurezza dei percorsi. Le
 funzioni di rilevamento stabile del volume sorgente sono incluse; la copia vera
 e propria è collegata alla dashboard WPF tramite preflight conservativo. Le
@@ -169,7 +169,7 @@ self-contained per Windows x64. La pubblicazione non è ancora una release
 firmata né un installer.
 
 I tag `v*` avviano un secondo workflow che crea archivio ZIP, checksum SHA-256 e
-GitHub Release in stato **draft**. Il checksum viene allegato come file
+GitHub Release in stato **draft pre-release**. Il checksum viene allegato come file
 `DriveHarbor-<versione>-win-x64.zip.sha256` e può essere verificato con
 `Get-FileHash`. La release deve essere revisionata usando la
 [checklist](docs/release-checklist.md) e pubblicata manualmente.
