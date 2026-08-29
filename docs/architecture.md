@@ -23,7 +23,8 @@ senza duplicare le regole di sicurezza.
    `%LocalAppData%\DriveHarbor` e non sovrascrive configurazioni illeggibili.
 2. `PathSafetyValidator` impedisce percorsi uguali, annidati, non disponibili o
    con destinazione esterna alle radici OneDrive note.
-3. `DriveDetectionService` risolve il volume tramite più identificatori stabili.
+3. `WindowsVolumeCatalog` legge GUID, seriale, label e tipo delle unità pronte;
+   `DriveDetectionService` acquisisce e risolve l'identità in modo fail-closed.
 4. `RobocopyService` costruisce ed esegue il comando senza finestra console.
 5. `SynchronizationService` applica precondizioni, modalità e cancellazione.
 6. `LogService` produce eventi leggibili dalla UI e file giornalieri limitati.
@@ -34,6 +35,15 @@ servono per isolare dipendenze di sistema nei test.
 `IOneDriveRootProvider` è la prima interfaccia di sistema: permette alla logica
 di validazione di usare le variabili OneDrive di Windows in produzione e radici
 temporanee controllate nei test.
+
+`IVolumeCatalog` isola l'enumerazione Win32 dai criteri di corrispondenza. Il
+resolver preferisce il GUID, usa il seriale quando il GUID corrente non è
+leggibile e usa la label solo per disambiguare. Un seriale duplicato senza altro
+segnale produce lo stato `Ambiguous`, mai una scelta automatica.
+
+Il percorso assoluto configurato conserva il percorso relativo alla radice del
+volume. Dopo un cambio lettera viene ricostruito sulla radice rilevata e deve
+esistere prima che lo stato diventi `Connected`.
 
 ## Decisioni iniziali
 

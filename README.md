@@ -24,8 +24,10 @@ richiede account aggiuntivi, non include telemetria e non invia dati all'esterno
 
 La versione corrente è `0.1.0`. Sono disponibili la foundation tecnica, il
 modello di configurazione locale e le regole di sicurezza dei percorsi. Le
-funzioni di sincronizzazione verranno aggiunte tramite Pull Request piccole e
-verificabili. Consulta la [roadmap](docs/roadmap.md) per la sequenza prevista.
+funzioni di rilevamento stabile del volume sorgente sono incluse; la copia vera
+e propria non è ancora implementata. Le funzionalità vengono aggiunte tramite
+Pull Request piccole e verificabili. Consulta la [roadmap](docs/roadmap.md) per
+la sequenza prevista.
 
 ## Configurazione locale
 
@@ -49,6 +51,23 @@ La validazione rifiuta:
 
 La UI per selezionare e modificare queste impostazioni arriverà nella feature
 dedicata alla dashboard.
+
+## Rilevamento dell'SSD
+
+DriveHarbor non si affida soltanto alla lettera dell'unità. Al momento della
+configurazione acquisisce, quando Windows li rende disponibili:
+
+1. GUID del volume;
+2. numero seriale del volume;
+3. etichetta, usata solo per distinguere corrispondenze multiple.
+
+Quando l'SSD viene ricollegato con una lettera diversa, il percorso relativo
+della cartella sorgente viene applicato alla nuova unità. La sola etichetta non
+è considerata un'identità sufficiente. Corrispondenze assenti o ambigue bloccano
+la futura sincronizzazione.
+
+Windows può classificare un SSD USB come unità `Fixed`; per questo DriveHarbor
+non rifiuta un volume basandosi soltanto sul tipo riportato dal sistema.
 
 ## Backup e Mirror
 
