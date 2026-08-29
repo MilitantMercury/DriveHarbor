@@ -16,10 +16,10 @@ feature della dashboard.
 Acquisizione e risoluzione dell'identità del volume, cambio lettera, stati
 collegato/non collegato e gestione fail-closed delle corrispondenze ambigue.
 
-## 4. Robocopy sync engine
+## 4. Robocopy sync engine — completata
 
-Costruzione sicura degli argomenti, Backup/Mirror, interpretazione risultati,
-output in tempo reale, annullamento e file di log con retention.
+Costruzione sicura degli argomenti, Backup/Mirror e anteprima, interpretazione
+risultati, output in tempo reale, annullamento e file di log con retention.
 
 ## 5. Desktop dashboard
 

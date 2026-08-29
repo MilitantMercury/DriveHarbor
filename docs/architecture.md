@@ -25,7 +25,9 @@ senza duplicare le regole di sicurezza.
    con destinazione esterna alle radici OneDrive note.
 3. `WindowsVolumeCatalog` legge GUID, seriale, label e tipo delle unità pronte;
    `DriveDetectionService` acquisisce e risolve l'identità in modo fail-closed.
-4. `RobocopyService` costruisce ed esegue il comando senza finestra console.
+4. `RobocopyCommandBuilder` applica i guardrail Backup/Mirror;
+   `RobocopyRunner` esegue il processo senza console, cattura output ed errori,
+   limita le righe in memoria e supporta l'annullamento.
 5. `SynchronizationService` applica precondizioni, modalità e cancellazione.
 6. `LogService` produce eventi leggibili dalla UI e file giornalieri limitati.
 
@@ -44,6 +46,20 @@ segnale produce lo stato `Ambiguous`, mai una scelta automatica.
 Il percorso assoluto configurato conserva il percorso relativo alla radice del
 volume. Dopo un cambio lettera viene ricostruito sulla radice rilevata e deve
 esistere prima che lo stato diventi `Connected`.
+
+## Robocopy e logging
+
+Il builder riceve ogni argomento separatamente tramite `ProcessStartInfo` e non
+costruisce una command line concatenata. Backup usa `/E`; soltanto Mirror usa
+`/MIR` e una richiesta reale priva di `MirrorConfirmed` viene rifiutata. `/L`
+permette la fase di anteprima senza scritture. `/XJ` evita di attraversare
+junction e `/COPY:DAT` evita di replicare ACL potenzialmente incompatibili.
+
+Gli exit code 0-7 sono successo o successo con avvisi; da 8 in poi sono errori.
+La UI riceverà messaggi comprensibili e non i dettagli tecnici del codice.
+
+`DailyFileLogger` serializza le scritture, neutralizza newline inserite nei
+messaggi e applica retention temporale, limite per file e limite complessivo.
 
 ## Decisioni iniziali
 
