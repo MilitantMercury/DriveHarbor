@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.400
+
+      - name: Restore
+        run: dotnet restore DriveHarbor.slnx --locked-mode
+
+      - name: Build
+        run: dotnet build DriveHarbor.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test DriveHarbor.slnx --configuration Release --no-build --collect:"XPlat Code Coverage"
+
+      - name: Publish Windows x64
+        run: dotnet publish src/DriveHarbor.App/DriveHarbor.App.csproj --configuration Release --runtime win-x64 --self-contained true --no-restore --output artifacts/DriveHarbor-win-x64
+
+      - name: Upload application artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DriveHarbor-win-x64
+          path: artifacts/DriveHarbor-win-x64
+          if-no-files-found: error

@@ -1,0 +1,40 @@
+﻿<Window x:Class="DriveHarbor.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DriveHarbor.App"
+        mc:Ignorable="d"
+        Title="DriveHarbor" Height="640" Width="1040"
+        MinHeight="560" MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F7FA">
+    <Grid Margin="40">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock FontSize="30" FontWeight="SemiBold" Foreground="#13233A"
+                       Text="DriveHarbor" />
+            <TextBlock Margin="0,8,0,0" FontSize="16" Foreground="#52657A"
+                       Text="Il porto sicuro tra il tuo SSD e OneDrive" />
+        </StackPanel>
+
+        <Border Grid.Row="1" Margin="0,32,0,32" Padding="32" Background="White"
+                BorderBrush="#DCE4EC" BorderThickness="1" CornerRadius="12">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock FontSize="22" FontWeight="SemiBold" Foreground="#13233A"
+                           HorizontalAlignment="Center" Text="Fondamenta del progetto pronte" />
+                <TextBlock Margin="0,12,0,0" Width="520" TextAlignment="Center"
+                           TextWrapping="Wrap" FontSize="15" Foreground="#52657A"
+                           Text="La configurazione sicura di sorgente e destinazione verrà introdotta nella prossima feature." />
+            </StackPanel>
+        </Border>
+
+        <TextBlock Grid.Row="2" Foreground="#6B7E92"
+                   Text="Versione 0.1.0 · Funzionamento completamente locale" />
+    </Grid>
+</Window>
