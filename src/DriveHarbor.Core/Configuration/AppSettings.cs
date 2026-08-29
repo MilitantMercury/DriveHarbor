@@ -24,5 +24,11 @@ public sealed record AppSettings
 
     public string LogDirectory { get; init; } = AppPaths.DefaultLogDirectory;
 
+    public DateTimeOffset? LastSynchronizationUtc { get; init; }
+
+    public string? LastSynchronizationResult { get; init; }
+
+    public long? LastCopiedFiles { get; init; }
+
     public static AppSettings CreateDefault() => new();
 }

@@ -25,9 +25,23 @@ richiede account aggiuntivi, non include telemetria e non invia dati all'esterno
 La versione corrente è `0.1.0`. Sono disponibili la foundation tecnica, il
 modello di configurazione locale e le regole di sicurezza dei percorsi. Le
 funzioni di rilevamento stabile del volume sorgente sono incluse; la copia vera
-e propria non è ancora implementata. Le funzionalità vengono aggiunte tramite
-Pull Request piccole e verificabili. Consulta la [roadmap](docs/roadmap.md) per
-la sequenza prevista.
+e propria è collegata alla dashboard WPF tramite preflight conservativo. Le
+funzionalità vengono aggiunte tramite Pull Request piccole e verificabili.
+Consulta la [roadmap](docs/roadmap.md) per la sequenza prevista.
+
+## Interfaccia
+
+La dashboard mostra stato SSD e OneDrive, modalità, ultima sincronizzazione,
+ultimo risultato e log in tempo reale. La pagina Impostazioni permette di
+selezionare sorgente, destinazione, modalità, esclusioni e posizione dei log.
+
+La UI resta reattiva mentre Robocopy lavora e offre l'annullamento. Lo stato dei
+volumi viene aggiornato periodicamente. Per Mirror il flusso è deliberatamente
+più lungo:
+
+1. conferma per avviare l'analisi;
+2. anteprima Robocopy senza modifiche;
+3. nuova conferma esplicita prima dell'esecuzione reale.
 
 ## Configurazione locale
 
@@ -48,9 +62,11 @@ La validazione rifiuta:
 - percorsi uguali;
 - una cartella contenuta nell'altra, in entrambe le direzioni;
 - destinazioni esterne alle cartelle OneDrive note a Windows.
+- percorsi che attraversano junction o link simbolici;
+- una posizione log sovrapposta a sorgente o destinazione.
 
-La UI per selezionare e modificare queste impostazioni arriverà nella feature
-dedicata alla dashboard.
+Le modifiche annullate nella pagina Impostazioni vengono scartate e non cambiano
+la configurazione usata per sincronizzare.
 
 ## Rilevamento dell'SSD
 

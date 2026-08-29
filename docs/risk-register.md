@@ -15,7 +15,9 @@
 | Mirror parzialmente applicato prima di un errore | Critica | Rischio intrinseco Robocopy: preflight, anteprima e conferma prima dell'avvio; mai operare sulla sorgente |
 | Output molto grande esaurisce la memoria | Media | Buffer limitato alle ultime 2.000 righe per stdout e stderr |
 | Configurazione corrotta o di versione futura | Alta | Default Backup, avviso e nessuna sovrascrittura automatica del file originale |
-| Junction o link che aggirano la relazione testuale dei percorsi | Alta | Rischio residuo: risoluzione dei path finali prima di abilitare la sincronizzazione |
+| Junction o link che aggirano la relazione testuale dei percorsi | Alta | Ogni segmento esistente viene controllato; presenza o errore di lettura bloccano la configurazione |
+| Log configurato dentro i dati sincronizzati | Alta | Validatore dedicato rifiuta uguaglianza e annidamento in entrambe le direzioni |
+| Stato cambiato dopo l'apertura della UI | Alta | Preflight ripetuto immediatamente prima di preview e sincronizzazione |
 | Spazio insufficiente o accesso negato | Media | Preflight, messaggi comprensibili e conservazione del log tecnico locale |
 | Crescita incontrollata dei log | Media | Rotazione giornaliera, limite temporale e dimensionale |
 | Supply-chain di dipendenze | Media | Dipendenze minime, lock file NuGet e CI con restore bloccato |
