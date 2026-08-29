@@ -22,6 +22,20 @@ public sealed class PathSafetyValidator(IOneDriveRootProvider oneDriveRootProvid
                 "La cartella di destinazione non è disponibile."));
         }
 
+        if (source is not null && Directory.Exists(source) && ContainsReparsePoint(source))
+        {
+            issues.Add(new(
+                PathValidationCode.PathContainsReparsePoint,
+                "La sorgente attraversa un collegamento o una junction e non può essere usata in sicurezza."));
+        }
+
+        if (destination is not null && Directory.Exists(destination) && ContainsReparsePoint(destination))
+        {
+            issues.Add(new(
+                PathValidationCode.PathContainsReparsePoint,
+                "La destinazione attraversa un collegamento o una junction e non può essere usata in sicurezza."));
+        }
+
         if (source is not null && destination is not null)
         {
             if (string.Equals(source, destination, StringComparison.OrdinalIgnoreCase))
@@ -114,5 +128,32 @@ public sealed class PathSafetyValidator(IOneDriveRootProvider oneDriveRootProvid
             && !relativePath.Equals("..", StringComparison.Ordinal)
             && !relativePath.StartsWith($"..{Path.DirectorySeparatorChar}", StringComparison.Ordinal)
             && !relativePath.StartsWith($"..{Path.AltDirectorySeparatorChar}", StringComparison.Ordinal);
+    }
+
+    private static bool ContainsReparsePoint(string path)
+    {
+        try
+        {
+            var root = Path.GetPathRoot(path)!;
+            var current = root;
+            var relative = Path.GetRelativePath(root, path);
+            foreach (var segment in relative.Split(
+                [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
+                StringSplitOptions.RemoveEmptyEntries))
+            {
+                current = Path.Combine(current, segment);
+                if ((File.GetAttributes(current) & FileAttributes.ReparsePoint) != 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        catch (Exception exception) when (
+            exception is IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            return true;
+        }
     }
 }

@@ -28,7 +28,8 @@ senza duplicare le regole di sicurezza.
 4. `RobocopyCommandBuilder` applica i guardrail Backup/Mirror;
    `RobocopyRunner` esegue il processo senza console, cattura output ed errori,
    limita le righe in memoria e supporta l'annullamento.
-5. `SynchronizationService` applica precondizioni, modalità e cancellazione.
+5. `SynchronizationService` ripete rilevamento volume e validazione percorsi
+   immediatamente prima di anteprima o sincronizzazione.
 6. `LogService` produce eventi leggibili dalla UI e file giornalieri limitati.
 
 Le interfacce verranno introdotte quando esiste un secondo consumatore o quando
@@ -60,6 +61,18 @@ La UI riceverà messaggi comprensibili e non i dettagli tecnici del codice.
 
 `DailyFileLogger` serializza le scritture, neutralizza newline inserite nei
 messaggi e applica retention temporale, limite per file e limite complessivo.
+
+## Desktop
+
+`DriveHarbor.App` usa MVVM leggero senza container o framework esterni.
+`MainViewModel` gestisce navigazione, selezione cartelle, salvataggio, stati e
+operazioni asincrone. I dialog di sistema sono dietro `IFolderPicker` e
+`IUserDialog`; la composizione esplicita avviene in `App.OnStartup`.
+
+La UI non costruisce comandi Robocopy. Per ogni esecuzione crea un logger nella
+posizione configurata e chiama `SynchronizationService`. Mirror viene prima
+eseguito come preview e richiede una seconda conferma prima della richiesta con
+`MirrorConfirmed`.
 
 ## Decisioni iniziali
 

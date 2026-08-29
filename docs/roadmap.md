@@ -21,10 +21,10 @@ collegato/non collegato e gestione fail-closed delle corrispondenze ambigue.
 Costruzione sicura degli argomenti, Backup/Mirror e anteprima, interpretazione
 risultati, output in tempo reale, annullamento e file di log con retention.
 
-## 5. Desktop dashboard
+## 5. Desktop dashboard — completata
 
-Dashboard accessibile, pagina Impostazioni, conferme Mirror e messaggi orientati
-agli utenti non tecnici.
+Dashboard, pagina Impostazioni, log in tempo reale, annullamento, anteprima e
+doppia conferma Mirror con messaggi orientati agli utenti non tecnici.
 
 ## 6. V1 hardening
 

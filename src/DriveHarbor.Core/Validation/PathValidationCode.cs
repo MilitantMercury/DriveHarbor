@@ -10,5 +10,6 @@ public enum PathValidationCode
     DestinationDoesNotExist,
     PathsAreEqual,
     PathsAreNested,
+    PathContainsReparsePoint,
     DestinationOutsideOneDrive,
 }
