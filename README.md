@@ -22,9 +22,33 @@ richiede account aggiuntivi, non include telemetria e non invia dati all'esterno
 
 ## Stato del progetto
 
-La versione corrente è `0.1.0` e contiene la foundation tecnica. Le funzioni di
-sincronizzazione verranno aggiunte tramite Pull Request piccole e verificabili.
-Consulta la [roadmap](docs/roadmap.md) per la sequenza prevista.
+La versione corrente è `0.1.0`. Sono disponibili la foundation tecnica, il
+modello di configurazione locale e le regole di sicurezza dei percorsi. Le
+funzioni di sincronizzazione verranno aggiunte tramite Pull Request piccole e
+verificabili. Consulta la [roadmap](docs/roadmap.md) per la sequenza prevista.
+
+## Configurazione locale
+
+Le impostazioni vengono salvate in:
+
+```text
+%LocalAppData%\DriveHarbor\settings.json
+```
+
+Il formato JSON è versionato e il salvataggio usa un file temporaneo sostituito
+atomicamente. Un file assente produce impostazioni sicure con modalità Backup;
+un file corrotto o di versione sconosciuta non viene sovrascritto e richiede la
+verifica dell'utente.
+
+La validazione rifiuta:
+
+- sorgente o destinazione mancanti e non disponibili;
+- percorsi uguali;
+- una cartella contenuta nell'altra, in entrambe le direzioni;
+- destinazioni esterne alle cartelle OneDrive note a Windows.
+
+La UI per selezionare e modificare queste impostazioni arriverà nella feature
+dedicata alla dashboard.
 
 ## Backup e Mirror
 

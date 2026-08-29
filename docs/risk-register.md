@@ -9,6 +9,8 @@
 | SSD scollegato durante la copia | Alta | Monitoraggio processo, annullamento e risultato di errore senza ulteriori cancellazioni |
 | Destinazione OneDrive indisponibile | Alta | Verifica immediatamente prima dell'avvio; nessuna creazione implicita rischiosa |
 | Interpretazione errata degli exit code Robocopy | Alta | Modello esplicito e test per i codici 0-16 |
+| Configurazione corrotta o di versione futura | Alta | Default Backup, avviso e nessuna sovrascrittura automatica del file originale |
+| Junction o link che aggirano la relazione testuale dei percorsi | Alta | Rischio residuo: risoluzione dei path finali prima di abilitare la sincronizzazione |
 | Spazio insufficiente o accesso negato | Media | Preflight, messaggi comprensibili e conservazione del log tecnico locale |
 | Crescita incontrollata dei log | Media | Rotazione giornaliera, limite temporale e dimensionale |
 | Supply-chain di dipendenze | Media | Dipendenze minime, lock file NuGet e CI con restore bloccato |

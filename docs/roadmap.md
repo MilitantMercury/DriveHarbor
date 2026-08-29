@@ -1,14 +1,15 @@
 # Roadmap V1
 
-## 1. Project foundation
+## 1. Project foundation — completata
 
 Solution, build deterministica, test, CI, pubblicazione self-contained e
 documentazione delle decisioni di sicurezza.
 
-## 2. Configuration and path safety
+## 2. Configuration and path safety — completata
 
-Modello impostazioni, persistenza in AppData, selezione cartelle, esclusioni e
-validazione dei percorsi con test non distruttivi.
+Modello impostazioni, persistenza atomica in AppData, esclusioni e validazione
+dei percorsi con test non distruttivi. La selezione visuale sarà collegata nella
+feature della dashboard.
 
 ## 3. Drive detection
 
