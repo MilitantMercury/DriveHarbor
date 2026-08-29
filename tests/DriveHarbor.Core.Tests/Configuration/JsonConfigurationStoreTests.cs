@@ -32,6 +32,7 @@ public sealed class JsonConfigurationStoreTests
             Mode = SyncMode.Mirror,
             SourceDrive = new DriveFingerprint
             {
+                VolumeGuidPath = @"\\?\Volume{11111111-1111-1111-1111-111111111111}\",
                 VolumeSerialNumber = "1234-ABCD",
                 VolumeLabel = "ARCHIVE",
             },

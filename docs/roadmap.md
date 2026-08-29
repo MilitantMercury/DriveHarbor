@@ -11,10 +11,10 @@ Modello impostazioni, persistenza atomica in AppData, esclusioni e validazione
 dei percorsi con test non distruttivi. La selezione visuale sarà collegata nella
 feature della dashboard.
 
-## 3. Drive detection
+## 3. Drive detection — completata
 
-Acquisizione e risoluzione dell'identità del volume, stati collegato/non
-collegato e gestione delle corrispondenze ambigue.
+Acquisizione e risoluzione dell'identità del volume, cambio lettera, stati
+collegato/non collegato e gestione fail-closed delle corrispondenze ambigue.
 
 ## 4. Robocopy sync engine
 
