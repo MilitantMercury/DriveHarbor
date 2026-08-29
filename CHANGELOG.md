@@ -5,6 +5,8 @@ Il progetto segue il versionamento semantico.
 
 ## [Unreleased]
 
+## [1.0.0-beta.1] - 2026-08-29
+
 ### Added
 
 - Dashboard WPF e pagina Impostazioni.

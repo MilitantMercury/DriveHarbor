@@ -11,6 +11,6 @@
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <Authors>MilitantMercury</Authors>
     <Product>DriveHarbor</Product>
-    <Version>0.1.0</Version>
+    <Version>1.0.0-beta.1</Version>
   </PropertyGroup>
 </Project>

@@ -30,5 +30,5 @@ stati verificati manualmente.
 - [ ] Draft release revisionata manualmente prima della pubblicazione.
 
 Il workflow associato ai tag `v*` crea deliberatamente una release in stato
-**draft**. Lo ZIP e il relativo file `.sha256` vengono allegati insieme; la
-pubblicazione resta sempre un'azione manuale.
+**draft pre-release**. Lo ZIP e il relativo file `.sha256` vengono allegati
+insieme; la pubblicazione resta sempre un'azione manuale.
