@@ -69,6 +69,27 @@ la futura sincronizzazione.
 Windows può classificare un SSD USB come unità `Fixed`; per questo DriveHarbor
 non rifiuta un volume basandosi soltanto sul tipo riportato dal sistema.
 
+## Motore di sincronizzazione
+
+La V1 usa `robocopy.exe`, incluso in Windows, avviato senza finestra console e
+con output acquisito in modo asincrono. Il motore supporta:
+
+- Backup con `/E`, senza opzioni di eliminazione;
+- Mirror con `/MIR`, bloccato senza conferma esplicita;
+- anteprima con `/L`, che elenca le operazioni senza modificare i file;
+- due nuovi tentativi con attesa breve per file temporaneamente occupati;
+- esclusione delle junction per evitare loop;
+- annullamento con terminazione del processo figlio;
+- interpretazione corretta dei codici Robocopy: da 0 a 7 non sono errori.
+
+Il log locale usa file giornalieri in `%LocalAppData%\DriveHarbor\Logs`, con 30
+giorni di conservazione, massimo 10 MB per file e 100 MB complessivi. Le righe
+sono limitate e non viene mai letto o registrato il contenuto dei file utente.
+
+> [!WARNING]
+> Mirror può eliminare elementi nella sola destinazione. Prima di renderlo
+> disponibile nella UI verranno collegati preflight, anteprima e doppia conferma.
+
 ## Backup e Mirror
 
 | Modalità | Copia file nuovi e modificati | Elimina dalla destinazione |

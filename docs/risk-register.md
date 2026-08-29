@@ -11,6 +11,9 @@
 | SSD scollegato durante la copia | Alta | Monitoraggio processo, annullamento e risultato di errore senza ulteriori cancellazioni |
 | Destinazione OneDrive indisponibile | Alta | Verifica immediatamente prima dell'avvio; nessuna creazione implicita rischiosa |
 | Interpretazione errata degli exit code Robocopy | Alta | Modello esplicito e test per i codici 0-16 |
+| Comando Robocopy costruito con argomenti non sicuri | Alta | `ArgumentList`, esclusioni validate e test dei flag per ogni modalità |
+| Mirror parzialmente applicato prima di un errore | Critica | Rischio intrinseco Robocopy: preflight, anteprima e conferma prima dell'avvio; mai operare sulla sorgente |
+| Output molto grande esaurisce la memoria | Media | Buffer limitato alle ultime 2.000 righe per stdout e stderr |
 | Configurazione corrotta o di versione futura | Alta | Default Backup, avviso e nessuna sovrascrittura automatica del file originale |
 | Junction o link che aggirano la relazione testuale dei percorsi | Alta | Rischio residuo: risoluzione dei path finali prima di abilitare la sincronizzazione |
 | Spazio insufficiente o accesso negato | Media | Preflight, messaggi comprensibili e conservazione del log tecnico locale |
