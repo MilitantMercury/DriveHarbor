@@ -19,8 +19,10 @@ senza duplicare le regole di sicurezza.
 
 ## Componenti previsti
 
-1. `ConfigurationService` salva un file JSON in `%LocalAppData%\DriveHarbor`.
-2. `PathSafetyValidator` impedisce percorsi uguali, annidati o non disponibili.
+1. `JsonConfigurationStore` salva atomicamente un file JSON versionato in
+   `%LocalAppData%\DriveHarbor` e non sovrascrive configurazioni illeggibili.
+2. `PathSafetyValidator` impedisce percorsi uguali, annidati, non disponibili o
+   con destinazione esterna alle radici OneDrive note.
 3. `DriveDetectionService` risolve il volume tramite più identificatori stabili.
 4. `RobocopyService` costruisce ed esegue il comando senza finestra console.
 5. `SynchronizationService` applica precondizioni, modalità e cancellazione.
@@ -28,6 +30,10 @@ senza duplicare le regole di sicurezza.
 
 Le interfacce verranno introdotte quando esiste un secondo consumatore o quando
 servono per isolare dipendenze di sistema nei test.
+
+`IOneDriveRootProvider` è la prima interfaccia di sistema: permette alla logica
+di validazione di usare le variabili OneDrive di Windows in produzione e radici
+temporanee controllate nei test.
 
 ## Decisioni iniziali
 
