@@ -15,6 +15,7 @@ Il progetto segue il versionamento semantico.
 - Validazione fail-closed di percorsi, junction e posizione log.
 - Preflight dello spazio libero e classificazione degli errori comuni.
 - Build e draft release self-contained Windows x64 tramite GitHub Actions.
+- Test d'integrazione reali Backup/Mirror su directory temporanee sacrificabili.
 
 ### Security
 

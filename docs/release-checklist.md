@@ -13,9 +13,9 @@ stati verificati manualmente.
 
 ## Sicurezza dati
 
-- [ ] Backup verificato soltanto su directory temporanee dedicate.
-- [ ] Mirror verificato soltanto su directory temporanee sacrificabili.
-- [ ] Confermato che nessun test usa directory reali dell'utente.
+- [ ] Backup verificato su directory temporanee dedicate (coperto anche in CI).
+- [ ] Mirror verificato su directory temporanee sacrificabili (coperto anche in CI).
+- [ ] Confermato che nessun test usa directory reali dell'utente (la suite automatica usa `%TEMP%`).
 - [ ] Testati SSD scollegato e destinazione rimossa prima dell'avvio.
 - [ ] Testato scollegamento del supporto durante una copia isolata.
 - [ ] Testati spazio insufficiente, accesso negato e file occupato.

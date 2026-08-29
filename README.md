@@ -151,6 +151,9 @@ I test che coinvolgeranno file useranno esclusivamente directory temporanee
 create per il singolo test. Non devono essere eseguiti test distruttivi su
 directory reali dell'utente.
 
+La [validazione release](docs/release-validation.md) descrive i test reali di
+Backup e Mirror eseguiti da Robocopy su fixture temporanee sacrificabili.
+
 ## Build pubblicabile
 
 ```powershell
