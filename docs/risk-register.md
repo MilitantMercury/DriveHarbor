@@ -18,9 +18,11 @@
 | Junction o link che aggirano la relazione testuale dei percorsi | Alta | Ogni segmento esistente viene controllato; presenza o errore di lettura bloccano la configurazione |
 | Log configurato dentro i dati sincronizzati | Alta | Validatore dedicato rifiuta uguaglianza e annidamento in entrambe le direzioni |
 | Stato cambiato dopo l'apertura della UI | Alta | Preflight ripetuto immediatamente prima di preview e sincronizzazione |
-| Spazio insufficiente o accesso negato | Media | Preflight, messaggi comprensibili e conservazione del log tecnico locale |
+| Spazio insufficiente o accesso negato | Alta | Riserva minima 256 MB, classificazione errori e log tecnico locale |
+| Stima esatta dello spazio non disponibile prima di Robocopy | Media | Soglia minima più gestione ERROR 112; il preflight non garantisce capienza totale |
 | Crescita incontrollata dei log | Media | Rotazione giornaliera, limite temporale e dimensionale |
 | Supply-chain di dipendenze | Media | Dipendenze minime, lock file NuGet e CI con restore bloccato |
+| Release pubblicata senza verifica distruttiva isolata | Alta | Workflow crea solo draft e checklist manuale obbligatoria |
 
 Il registro viene aggiornato in ogni PR che introduce un nuovo comportamento
 capace di leggere, copiare o eliminare dati.

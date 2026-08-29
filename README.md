@@ -5,7 +5,8 @@
 ![Screenshot placeholder](https://placehold.co/1200x675/13233A/FFFFFF?text=DriveHarbor+Dashboard)
 
 > [!IMPORTANT]
-> DriveHarbor è in sviluppo e non è ancora pronto per proteggere dati reali.
+> DriveHarbor è in sviluppo. Prima della prima release pubblica deve completare
+> la checklist manuale su directory di test isolate.
 
 ## Cos'è DriveHarbor
 
@@ -61,7 +62,7 @@ La validazione rifiuta:
 - sorgente o destinazione mancanti e non disponibili;
 - percorsi uguali;
 - una cartella contenuta nell'altra, in entrambe le direzioni;
-- destinazioni esterne alle cartelle OneDrive note a Windows.
+- destinazioni esterne alle cartelle OneDrive note a Windows;
 - percorsi che attraversano junction o link simbolici;
 - una posizione log sovrapposta a sorgente o destinazione.
 
@@ -96,15 +97,17 @@ con output acquisito in modo asincrono. Il motore supporta:
 - due nuovi tentativi con attesa breve per file temporaneamente occupati;
 - esclusione delle junction per evitare loop;
 - annullamento con terminazione del processo figlio;
-- interpretazione corretta dei codici Robocopy: da 0 a 7 non sono errori.
+- interpretazione corretta dei codici Robocopy: da 0 a 7 non sono errori;
+- controllo preventivo di almeno 256 MB liberi nella destinazione;
+- messaggi specifici per spazio, permessi, file occupati e percorsi lunghi.
 
 Il log locale usa file giornalieri in `%LocalAppData%\DriveHarbor\Logs`, con 30
 giorni di conservazione, massimo 10 MB per file e 100 MB complessivi. Le righe
 sono limitate e non viene mai letto o registrato il contenuto dei file utente.
 
 > [!WARNING]
-> Mirror può eliminare elementi nella sola destinazione. Prima di renderlo
-> disponibile nella UI verranno collegati preflight, anteprima e doppia conferma.
+> Mirror può eliminare elementi nella sola destinazione. La UI esegue preflight,
+> anteprima e doppia conferma, ma una copia indipendente resta indispensabile.
 
 ## Backup e Mirror
 
@@ -162,6 +165,10 @@ La pipeline GitHub Actions esegue restore, build, test e produce un artifact
 self-contained per Windows x64. La pubblicazione non è ancora una release
 firmata né un installer.
 
+I tag `v*` avviano un secondo workflow che crea archivio ZIP e GitHub Release in
+stato **draft**. La release deve essere revisionata usando la
+[checklist](docs/release-checklist.md) e pubblicata manualmente.
+
 ## Struttura
 
 ```text
@@ -177,6 +184,7 @@ docs/                       Architettura, rischi e roadmap
 Le scelte tecniche sono descritte in [Architettura](docs/architecture.md). I
 rischi relativi alla perdita di dati sono tracciati nel
 [Registro dei rischi](docs/risk-register.md).
+Le modifiche sono riepilogate nel [Changelog](CHANGELOG.md).
 
 ## Avvertenze
 

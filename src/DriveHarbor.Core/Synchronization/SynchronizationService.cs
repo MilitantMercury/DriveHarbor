@@ -6,12 +6,29 @@ using DriveHarbor.Core.Validation;
 
 namespace DriveHarbor.Core.Synchronization;
 
-public sealed class SynchronizationService(
-    DriveDetectionService driveDetectionService,
-    PathSafetyValidator pathSafetyValidator,
-    IRobocopyRunner robocopyRunner,
-    IAppLogger logger)
+public sealed class SynchronizationService
 {
+    private const long MinimumFreeBytes = 256L * 1024 * 1024;
+    private readonly DriveDetectionService driveDetectionService;
+    private readonly PathSafetyValidator pathSafetyValidator;
+    private readonly IRobocopyRunner robocopyRunner;
+    private readonly IAppLogger logger;
+    private readonly IDiskSpaceProvider diskSpaceProvider;
+
+    public SynchronizationService(
+        DriveDetectionService driveDetectionService,
+        PathSafetyValidator pathSafetyValidator,
+        IRobocopyRunner robocopyRunner,
+        IAppLogger logger,
+        IDiskSpaceProvider? diskSpaceProvider = null)
+    {
+        this.driveDetectionService = driveDetectionService;
+        this.pathSafetyValidator = pathSafetyValidator;
+        this.robocopyRunner = robocopyRunner;
+        this.logger = logger;
+        this.diskSpaceProvider = diskSpaceProvider ?? new WindowsDiskSpaceProvider();
+    }
+
     public async Task<SynchronizationResult> PreviewMirrorAsync(
         AppSettings settings,
         IProgress<string>? progress = null,
@@ -117,6 +134,21 @@ public sealed class SynchronizationService(
                     ? SynchronizationStatus.DestinationUnavailable
                     : SynchronizationStatus.InvalidConfiguration,
                 validation.Issues[0].UserMessage));
+        }
+
+        var availableBytes = diskSpaceProvider.GetAvailableBytes(settings.DestinationPath!);
+        if (availableBytes is null)
+        {
+            return new(null, new(
+                SynchronizationStatus.DestinationUnavailable,
+                "Non è stato possibile verificare lo spazio disponibile nella destinazione."));
+        }
+
+        if (availableBytes < MinimumFreeBytes)
+        {
+            return new(null, new(
+                SynchronizationStatus.DestinationUnavailable,
+                "Spazio insufficiente nella destinazione. Libera almeno 256 MB e riprova."));
         }
 
         return new(drive.ResolvedSourcePath, null);

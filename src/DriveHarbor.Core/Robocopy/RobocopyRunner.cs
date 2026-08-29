@@ -46,13 +46,18 @@ public sealed class RobocopyRunner : IRobocopyRunner
             await Task.WhenAll(outputTask, errorTask).ConfigureAwait(false);
             var status = RobocopyExitCodeInterpreter.GetStatus(process.ExitCode);
             var outputSnapshot = output.Snapshot();
+            var errorSnapshot = errors.Snapshot();
+            var failure = status == RobocopyOperationStatus.Failed
+                ? RobocopyFailureClassifier.Classify(outputSnapshot, errorSnapshot)
+                : (RobocopyFailureKind.None, RobocopyExitCodeInterpreter.GetUserMessage(process.ExitCode));
             return new(
                 status,
                 process.ExitCode,
-                RobocopyExitCodeInterpreter.GetUserMessage(process.ExitCode),
+                failure.Item2,
                 RobocopyOutputParser.Parse(outputSnapshot),
                 outputSnapshot,
-                errors.Snapshot());
+                errorSnapshot,
+                failure.Item1);
         }
         catch (Exception exception) when (
             exception is InvalidOperationException or System.ComponentModel.Win32Exception)
@@ -114,7 +119,8 @@ public sealed class RobocopyRunner : IRobocopyRunner
         message,
         new(),
         [],
-        []);
+        [],
+        RobocopyFailureKind.EngineUnavailable);
 
     private sealed class BoundedLineBuffer(int capacity)
     {
