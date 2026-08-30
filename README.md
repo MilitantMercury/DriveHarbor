@@ -2,6 +2,8 @@
 
 > Sincronizzazione locale, semplice e sicura da SSD esterno a OneDrive per Windows.
 
+<img src="src/DriveHarbor.App/Assets/DriveHarbor.png" alt="Logo DriveHarbor" width="96">
+
 ![Screenshot placeholder](https://placehold.co/1200x675/13233A/FFFFFF?text=DriveHarbor+Dashboard)
 
 > [!IMPORTANT]
@@ -193,6 +195,9 @@ Le scelte tecniche sono descritte in [Architettura](docs/architecture.md). I
 rischi relativi alla perdita di dati sono tracciati nel
 [Registro dei rischi](docs/risk-register.md).
 Le modifiche sono riepilogate nel [Changelog](CHANGELOG.md).
+
+Il logo originale è incluso come PNG trasparente; l'app usa un file ICO
+multi-risoluzione per finestra, barra delle applicazioni ed eseguibile Windows.
 
 ## Avvertenze
 
