@@ -99,8 +99,18 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     public SyncMode Mode
     {
         get => mode;
-        set => SetProperty(ref mode, value);
+        set
+        {
+            if (SetProperty(ref mode, value))
+            {
+                OnPropertyChanged(nameof(ModeSummary));
+            }
+        }
     }
+
+    public string ModeSummary => Mode == SyncMode.Backup
+        ? "Copia e aggiorna senza eliminare dalla destinazione"
+        : "Rende la destinazione identica alla sorgente e può eliminare file";
 
     public string ExclusionsText
     {
