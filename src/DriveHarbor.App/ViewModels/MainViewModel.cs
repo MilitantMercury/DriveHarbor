@@ -31,6 +31,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private readonly IUpdateInstaller updateInstaller;
     private AppSettings savedSettings = AppSettings.CreateDefault();
     private CancellationTokenSource? synchronizationCancellation;
+    private CancellationTokenSource? autoSyncDelayCancellation;
+    private DriveConnectionStatus? previousDriveStatus;
     private string? sourcePath;
     private string? destinationPath;
     private SyncMode mode;
@@ -48,6 +50,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private string lastResult = "Nessuna sincronizzazione eseguita";
     private bool isBusy;
     private bool isSettingsPageVisible;
+    private bool syncOnDriveConnected;
+    private int driveConnectedDelaySeconds = 10;
 
     public MainViewModel(
         IConfigurationStore configurationStore,
@@ -80,7 +84,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         BrowseLogDirectoryCommand = new(BrowseLogDirectory);
         SaveSettingsCommand = new(SaveSettingsAsync, () => !IsBusy, HandleUnexpectedError);
         SynchronizeCommand = new(SynchronizeAsync, CanSynchronize, HandleUnexpectedError);
-        CancelCommand = new(CancelSynchronization, () => IsBusy);
+        CancelCommand = new(CancelSynchronization, () => IsBusy || autoSyncDelayCancellation is not null);
         CheckForUpdatesCommand = new(() => CheckForUpdatesAsync(true), () => !IsBusy, HandleUnexpectedError);
         OpenUpdateCommand = new(OpenUpdate, () => updateUri is not null);
         DownloadUpdateCommand = new(DownloadUpdateAsync, () => updateUri is not null && !IsBusy, HandleUnexpectedError);
@@ -131,6 +135,20 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     }
 
     public Visibility UpdateVisibility => updateUri is null ? Visibility.Collapsed : Visibility.Visible;
+
+    public bool SyncOnDriveConnected
+    {
+        get => syncOnDriveConnected;
+        set => SetProperty(ref syncOnDriveConnected, value);
+    }
+
+    public IReadOnlyList<int> AvailableDriveConnectedDelays { get; } = [5, 10, 30, 60, 120, 300, 600];
+
+    public int DriveConnectedDelaySeconds
+    {
+        get => driveConnectedDelaySeconds;
+        set => SetProperty(ref driveConnectedDelaySeconds, value);
+    }
 
     public bool UseSystemTheme
     {
@@ -288,6 +306,9 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     public void RefreshAvailability()
     {
         var drive = driveDetectionService.Resolve(savedSettings.SourcePath, savedSettings.SourceDrive);
+        var isFirstObservation = previousDriveStatus is null;
+        var wasConnected = previousDriveStatus == DriveConnectionStatus.Connected;
+        previousDriveStatus = drive.Status;
         SsdStatus = drive.Status switch
         {
             DriveConnectionStatus.Connected => "SSD collegato",
@@ -301,6 +322,14 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             && Directory.Exists(savedSettings.DestinationPath)
                 ? "Cartella disponibile"
                 : "Destinazione non disponibile";
+        if (drive.Status != DriveConnectionStatus.Connected)
+        {
+            CancelPendingAutoSync();
+        }
+        else if (!isFirstObservation && !wasConnected && savedSettings.SyncOnDriveConnected)
+        {
+            _ = ScheduleAutoSyncAsync();
+        }
         NotifyCommandStates();
     }
 
@@ -308,6 +337,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     {
         synchronizationCancellation?.Cancel();
         synchronizationCancellation?.Dispose();
+        CancelPendingAutoSync();
     }
 
     private void BrowseSource()
@@ -450,7 +480,54 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    private void CancelSynchronization() => synchronizationCancellation?.Cancel();
+    private void CancelSynchronization()
+    {
+        synchronizationCancellation?.Cancel();
+        CancelPendingAutoSync();
+    }
+
+    private async Task ScheduleAutoSyncAsync()
+    {
+        if (autoSyncDelayCancellation is not null || IsBusy) return;
+        if (savedSettings.Mode != SyncMode.Backup)
+        {
+            OperationStatus = "Avvio automatico bloccato: Mirror richiede conferma";
+            return;
+        }
+
+        autoSyncDelayCancellation = new();
+        NotifyCommandStates();
+        var token = autoSyncDelayCancellation.Token;
+        try
+        {
+            for (var remaining = savedSettings.DriveConnectedDelaySeconds; remaining > 0; remaining--)
+            {
+                OperationStatus = $"Sincronizzazione automatica tra {remaining} secondi";
+                await Task.Delay(TimeSpan.FromSeconds(1), token);
+            }
+            var drive = driveDetectionService.Resolve(savedSettings.SourcePath, savedSettings.SourceDrive);
+            if (drive.Status == DriveConnectionStatus.Connected && !IsBusy)
+            {
+                await SynchronizeAsync();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            OperationStatus = "Sincronizzazione automatica annullata";
+        }
+        catch (Exception exception)
+        {
+            HandleUnexpectedError(exception);
+        }
+        finally
+        {
+            autoSyncDelayCancellation?.Dispose();
+            autoSyncDelayCancellation = null;
+            NotifyCommandStates();
+        }
+    }
+
+    private void CancelPendingAutoSync() => autoSyncDelayCancellation?.Cancel();
 
     private bool CanSynchronize() =>
         !IsBusy
@@ -463,6 +540,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         themeService.Apply(settings.Theme);
         Theme = settings.Theme;
         UpdateChannel = settings.UpdateChannel;
+        SyncOnDriveConnected = settings.SyncOnDriveConnected;
+        DriveConnectedDelaySeconds = settings.DriveConnectedDelaySeconds;
         SourcePath = settings.SourcePath;
         DestinationPath = settings.DestinationPath;
         Mode = settings.Mode;
@@ -484,6 +563,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         Mode = Mode,
         Theme = Theme,
         UpdateChannel = UpdateChannel,
+        SyncOnDriveConnected = SyncOnDriveConnected,
+        DriveConnectedDelaySeconds = DriveConnectedDelaySeconds,
         Exclusions = ExclusionsText
             .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Distinct(StringComparer.OrdinalIgnoreCase)

@@ -20,6 +20,10 @@ public sealed record AppSettings
 
     public DateTimeOffset? LastUpdateCheckUtc { get; init; }
 
+    public bool SyncOnDriveConnected { get; init; }
+
+    public int DriveConnectedDelaySeconds { get; init; } = 10;
+
     public DriveFingerprint? SourceDrive { get; init; }
 
     public IReadOnlyList<string> Exclusions { get; init; } = Array.AsReadOnly<string>(

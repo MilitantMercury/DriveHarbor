@@ -13,6 +13,8 @@ public sealed class AppSettingsTests
         Assert.Equal(SyncMode.Backup, settings.Mode);
         Assert.Equal(AppTheme.System, settings.Theme);
         Assert.Equal(UpdateChannel.Stable, settings.UpdateChannel);
+        Assert.False(settings.SyncOnDriveConnected);
+        Assert.Equal(10, settings.DriveConnectedDelaySeconds);
         Assert.Contains("$RECYCLE.BIN", settings.Exclusions);
         Assert.Contains("System Volume Information", settings.Exclusions);
         Assert.Contains("*.tmp", settings.Exclusions);
