@@ -176,10 +176,18 @@ La pipeline GitHub Actions esegue restore, build, test e produce un artifact
 self-contained per Windows x64. La pubblicazione non è ancora una release
 firmata né un installer.
 
-I tag `v*` avviano un secondo workflow che crea archivio ZIP, checksum SHA-256 e
-GitHub Release in stato **draft pre-release**. Il checksum viene allegato come file
-`DriveHarbor-<versione>-win-x64.zip.sha256` e può essere verificato con
-`Get-FileHash`. La release deve essere revisionata usando la
+I tag `v*` avviano un secondo workflow che crea archivio ZIP, checksum SHA-256,
+attestazione Sigstore della provenienza e GitHub Release in stato **draft
+pre-release**. Checksum e bundle `.sigstore.json` vengono allegati allo ZIP. La
+provenienza può essere verificata con:
+
+```powershell
+gh attestation verify .\DriveHarbor-<versione>-win-x64.zip `
+  --repo MilitantMercury/DriveHarbor
+```
+
+La futura funzione di aggiornamento eseguirà la verifica automaticamente, senza
+richiedere GitHub CLI all'utente. La release deve essere revisionata usando la
 [checklist](docs/release-checklist.md) e pubblicata manualmente.
 
 ## Struttura
