@@ -15,7 +15,7 @@ Il progetto segue il versionamento semantico.
 - Download atomico degli aggiornamenti con limite dimensione e verifica SHA-256.
 - Workflow GitHub Actions aggiornati ai runtime Node.js 24.
 - Updater self-contained con conferma, riavvio e ripristino su errore.
-- Avvio Backup al collegamento dell'SSD con delay configurabile e annullamento sicuro.
+- Avvio Backup o Mirror autorizzato al collegamento dell'SSD, con delay configurabile e annullamento sicuro.
 
 ## [1.0.0-beta.1] - 2026-08-29
 

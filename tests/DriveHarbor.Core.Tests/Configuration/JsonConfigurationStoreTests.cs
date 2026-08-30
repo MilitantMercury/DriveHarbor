@@ -34,6 +34,7 @@ public sealed class JsonConfigurationStoreTests
             Theme = AppTheme.Dark,
             UpdateChannel = UpdateChannel.Beta,
             SyncOnDriveConnected = true,
+            AllowAutomaticMirror = true,
             DriveConnectedDelaySeconds = 30,
             SourceDrive = new DriveFingerprint
             {
@@ -54,6 +55,7 @@ public sealed class JsonConfigurationStoreTests
         Assert.Equal(expected.Theme, result.Settings.Theme);
         Assert.Equal(expected.UpdateChannel, result.Settings.UpdateChannel);
         Assert.Equal(expected.SyncOnDriveConnected, result.Settings.SyncOnDriveConnected);
+        Assert.Equal(expected.AllowAutomaticMirror, result.Settings.AllowAutomaticMirror);
         Assert.Equal(expected.DriveConnectedDelaySeconds, result.Settings.DriveConnectedDelaySeconds);
         Assert.Equal(expected.SourceDrive, result.Settings.SourceDrive);
         Assert.Equal(expected.Exclusions, result.Settings.Exclusions);

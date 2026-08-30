@@ -51,6 +51,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private bool isBusy;
     private bool isSettingsPageVisible;
     private bool syncOnDriveConnected;
+    private bool allowAutomaticMirror;
     private int driveConnectedDelaySeconds = 10;
 
     public MainViewModel(
@@ -140,6 +141,12 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     {
         get => syncOnDriveConnected;
         set => SetProperty(ref syncOnDriveConnected, value);
+    }
+
+    public bool AllowAutomaticMirror
+    {
+        get => allowAutomaticMirror;
+        set => SetProperty(ref allowAutomaticMirror, value);
     }
 
     public IReadOnlyList<int> AvailableDriveConnectedDelays { get; } = [5, 10, 30, 60, 120, 300, 600];
@@ -403,6 +410,16 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
+        if (Mode == SyncMode.Mirror && SyncOnDriveConnected && AllowAutomaticMirror
+            && !savedSettings.AllowAutomaticMirror
+            && !userDialog.Confirm(
+                "Consentire Mirror automatico?",
+                "Mirror automatico può eliminare dalla destinazione senza conferma a ogni collegamento. L'anteprima tecnica verrà comunque eseguita. Vuoi abilitarlo?"))
+        {
+            AllowAutomaticMirror = false;
+            return;
+        }
+
         var updated = BuildEditedSettings() with { SourceDrive = capture.Fingerprint };
         await configurationStore.SaveAsync(updated);
         savedSettings = updated;
@@ -413,7 +430,9 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         userDialog.ShowInformation("Impostazioni", "Impostazioni salvate.");
     }
 
-    private async Task SynchronizeAsync()
+    private Task SynchronizeAsync() => SynchronizeCoreAsync(automatic: false);
+
+    private async Task SynchronizeCoreAsync(bool automatic)
     {
         IsBusy = true;
         LogLines.Clear();
@@ -434,7 +453,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
             if (savedSettings.Mode == SyncMode.Mirror)
             {
-                if (!userDialog.Confirm(
+                if (!automatic && !userDialog.Confirm(
                     "Analizzare Mirror?",
                     "DriveHarbor analizzerà le modifiche senza cambiare alcun file. Continuare?"))
                 {
@@ -453,7 +472,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
                     return;
                 }
 
-                if (!userDialog.Confirm(
+                if (!automatic && !userDialog.Confirm(
                     "Conferma Mirror",
                     "L'anteprima è completata. Mirror può eliminare file soltanto dalla destinazione. Vuoi eseguire ora la sincronizzazione?"))
                 {
@@ -489,9 +508,9 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private async Task ScheduleAutoSyncAsync()
     {
         if (autoSyncDelayCancellation is not null || IsBusy) return;
-        if (savedSettings.Mode != SyncMode.Backup)
+        if (savedSettings.Mode == SyncMode.Mirror && !savedSettings.AllowAutomaticMirror)
         {
-            OperationStatus = "Avvio automatico bloccato: Mirror richiede conferma";
+            OperationStatus = "Avvio automatico bloccato: Mirror automatico non autorizzato";
             return;
         }
 
@@ -508,7 +527,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             var drive = driveDetectionService.Resolve(savedSettings.SourcePath, savedSettings.SourceDrive);
             if (drive.Status == DriveConnectionStatus.Connected && !IsBusy)
             {
-                await SynchronizeAsync();
+                await SynchronizeCoreAsync(automatic: true);
             }
         }
         catch (OperationCanceledException)
@@ -541,6 +560,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         Theme = settings.Theme;
         UpdateChannel = settings.UpdateChannel;
         SyncOnDriveConnected = settings.SyncOnDriveConnected;
+        AllowAutomaticMirror = settings.AllowAutomaticMirror;
         DriveConnectedDelaySeconds = settings.DriveConnectedDelaySeconds;
         SourcePath = settings.SourcePath;
         DestinationPath = settings.DestinationPath;
@@ -564,6 +584,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         Theme = Theme,
         UpdateChannel = UpdateChannel,
         SyncOnDriveConnected = SyncOnDriveConnected,
+        AllowAutomaticMirror = AllowAutomaticMirror,
         DriveConnectedDelaySeconds = DriveConnectedDelaySeconds,
         Exclusions = ExclusionsText
             .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)

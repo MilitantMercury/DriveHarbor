@@ -263,8 +263,11 @@
                     <Border Style="{StaticResource Card}" Margin="0,0,0,18">
                         <StackPanel>
                             <TextBlock Style="{StaticResource FieldLabel}" Text="Avvio sincronizzazione" />
-                            <CheckBox Foreground="{DynamicResource PrimaryTextBrush}" Content="Avvia Backup quando viene collegato l’SSD"
+                            <CheckBox Foreground="{DynamicResource PrimaryTextBrush}" Content="Avvia la sincronizzazione quando viene collegato l’SSD"
                                       IsChecked="{Binding SyncOnDriveConnected}" />
+                            <CheckBox Margin="0,10,0,0" Foreground="{DynamicResource MirrorTextBrush}"
+                                      Content="Consenti anche Mirror automatico senza conferme a ogni collegamento"
+                                      IsChecked="{Binding AllowAutomaticMirror}" />
                             <StackPanel Margin="0,14,0,0" Orientation="Horizontal">
                                 <TextBlock Margin="0,0,12,0" VerticalAlignment="Center" Foreground="{DynamicResource SecondaryTextBrush}"
                                            Text="Ritardo:" />
@@ -274,7 +277,7 @@
                                            Text="secondi" />
                             </StackPanel>
                             <TextBlock Margin="0,10,0,0" Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap"
-                                       Text="Funziona mentre DriveHarbor è aperto. Se l’SSD viene scollegato durante il countdown, l’avvio viene annullato. Mirror resta sempre manuale." />
+                                       Text="Funziona mentre DriveHarbor è aperto. Se l’SSD viene scollegato durante il countdown, l’avvio viene annullato. Mirror automatico esegue comunque l’anteprima tecnica, ma può eliminare file dalla destinazione senza altre conferme." />
                         </StackPanel>
                     </Border>
                     <Border Style="{StaticResource Card}" Margin="0,0,0,18">

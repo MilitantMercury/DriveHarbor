@@ -22,6 +22,8 @@ public sealed record AppSettings
 
     public bool SyncOnDriveConnected { get; init; }
 
+    public bool AllowAutomaticMirror { get; init; }
+
     public int DriveConnectedDelaySeconds { get; init; } = 10;
 
     public DriveFingerprint? SourceDrive { get; init; }
