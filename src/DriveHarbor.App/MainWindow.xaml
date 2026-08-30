@@ -155,7 +155,7 @@
                         Visibility="{Binding UpdateVisibility}">
                     <DockPanel>
                         <Button DockPanel.Dock="Right" Margin="16,0,0,0" Style="{StaticResource SecondaryButton}"
-                                Command="{Binding OpenUpdateCommand}" Content="Apri download" />
+                                Command="{Binding DownloadUpdateCommand}" Content="Scarica e verifica" />
                         <TextBlock VerticalAlignment="Center" Foreground="White" FontWeight="SemiBold" Text="{Binding UpdateMessage}" />
                     </DockPanel>
                 </Border>

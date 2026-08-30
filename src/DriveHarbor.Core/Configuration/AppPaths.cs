@@ -11,4 +11,6 @@ public static class AppPaths
     public static string DefaultSettingsFile => Path.Combine(LocalDataDirectory, "settings.json");
 
     public static string DefaultLogDirectory => Path.Combine(LocalDataDirectory, "Logs");
+
+    public static string UpdatesDirectory => Path.Combine(LocalDataDirectory, "Updates");
 }

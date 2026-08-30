@@ -33,7 +33,8 @@ public partial class App : Application, IDisposable
             new FolderPicker(),
             new UserDialog(),
             themeService,
-            new GitHubUpdateChecker(new HttpClient()));
+            new GitHubUpdateChecker(new HttpClient()),
+            new VerifiedUpdateDownloader(new HttpClient(), AppPaths.UpdatesDirectory));
 
         var window = new MainWindow(mainViewModel);
         MainWindow = window;
