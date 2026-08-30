@@ -88,6 +88,7 @@
                 <StackPanel Grid.Row="3" Margin="26,20">
                     <TextBlock Foreground="#8FA7BF" FontSize="11" Text="FUNZIONAMENTO LOCALE" />
                     <TextBlock Margin="0,5,0,0" Foreground="#C8D5E3" FontSize="12" Text="Nessuna telemetria" />
+                    <TextBlock Margin="0,9,0,0" Foreground="#7891AA" FontSize="11" Text="{Binding ApplicationVersion}" />
                 </StackPanel>
             </Grid>
         </Border>

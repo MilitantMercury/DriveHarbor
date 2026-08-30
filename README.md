@@ -198,6 +198,8 @@ Le modifiche sono riepilogate nel [Changelog](CHANGELOG.md).
 
 Il logo originale è incluso come PNG trasparente; l'app usa un file ICO
 multi-risoluzione per finestra, barra delle applicazioni ed eseguibile Windows.
+La versione mostrata nella barra laterale viene letta direttamente dai metadati
+dell'eseguibile, senza un valore separato scritto nell'interfaccia.
 
 ## Avvertenze
 

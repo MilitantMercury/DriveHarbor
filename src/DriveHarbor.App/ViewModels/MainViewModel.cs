@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using DriveHarbor.App.Infrastructure;
 using DriveHarbor.App.Services;
@@ -83,6 +84,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     public ObservableCollection<string> LogLines { get; } = [];
 
     public IReadOnlyList<SyncMode> AvailableModes { get; } = Enum.GetValues<SyncMode>();
+
+    public string ApplicationVersion { get; } = GetApplicationVersion();
 
     public string? SourcePath
     {
@@ -462,5 +465,14 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         userDialog.ShowError(
             "Errore imprevisto",
             "L'operazione è stata interrotta senza modificare la sorgente. " + exception.Message);
+    }
+
+    private static string GetApplicationVersion()
+    {
+        var informationalVersion = Assembly.GetEntryAssembly()?
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+            .InformationalVersion;
+        var version = informationalVersion?.Split('+', 2)[0];
+        return $"Versione {version ?? "non disponibile"}";
     }
 }
