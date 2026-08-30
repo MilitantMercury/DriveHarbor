@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DriveHarbor.Core\DriveHarbor.Core.csproj" />
+    <Resource Include="Assets\DriveHarbor.ico" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -13,6 +14,7 @@
     <AssemblyName>DriveHarbor</AssemblyName>
     <RootNamespace>DriveHarbor.App</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\DriveHarbor.ico</ApplicationIcon>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
   </PropertyGroup>
 

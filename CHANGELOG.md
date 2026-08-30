@@ -8,6 +8,7 @@ Il progetto segue il versionamento semantico.
 ### Added
 
 - Spiegazione in-app delle differenze e dei rischi di Backup e Mirror.
+- Logo originale, icona Windows multi-risoluzione e versione reale mostrata nell'app.
 
 ## [1.0.0-beta.1] - 2026-08-29
 
