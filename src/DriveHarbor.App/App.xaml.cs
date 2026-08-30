@@ -14,6 +14,7 @@ namespace DriveHarbor.App;
 public partial class App : Application, IDisposable
 {
     private MainViewModel? mainViewModel;
+    private ThemeService? themeService;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -21,13 +22,15 @@ public partial class App : Application, IDisposable
 
         var driveDetection = new DriveDetectionService(new WindowsVolumeCatalog());
         var pathValidator = new PathSafetyValidator(new EnvironmentOneDriveRootProvider());
+        themeService = new();
         mainViewModel = new(
             new JsonConfigurationStore(),
             driveDetection,
             pathValidator,
             new RobocopyRunner(),
             new FolderPicker(),
-            new UserDialog());
+            new UserDialog(),
+            themeService);
 
         var window = new MainWindow(mainViewModel);
         MainWindow = window;
@@ -44,6 +47,8 @@ public partial class App : Application, IDisposable
     {
         mainViewModel?.Dispose();
         mainViewModel = null;
+        themeService?.Dispose();
+        themeService = null;
         GC.SuppressFinalize(this);
     }
 }

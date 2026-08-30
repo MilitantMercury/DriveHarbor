@@ -48,6 +48,9 @@ più lungo:
 
 La pagina Impostazioni confronta direttamente Backup e Mirror e chiarisce quali
 file restano o vengono eliminati dalla destinazione prima della selezione.
+L'aspetto può essere impostato su Sistema, Chiaro o Scuro. La modalità Sistema,
+predefinita, segue il tema delle app configurato in Windows anche mentre
+DriveHarbor è aperto.
 
 ## Configurazione locale
 

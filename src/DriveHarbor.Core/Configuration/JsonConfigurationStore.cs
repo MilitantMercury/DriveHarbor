@@ -140,6 +140,7 @@ public sealed class JsonConfigurationStore : IConfigurationStore
 
     private static bool IsStructurallyValid(AppSettings settings) =>
         Enum.IsDefined(settings.Mode)
+        && Enum.IsDefined(settings.Theme)
         && settings.Exclusions is not null
         && settings.Exclusions.All(exclusion => !string.IsNullOrWhiteSpace(exclusion))
         && !string.IsNullOrWhiteSpace(settings.LogDirectory);

@@ -22,11 +22,13 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private readonly IRobocopyRunner robocopyRunner;
     private readonly IFolderPicker folderPicker;
     private readonly IUserDialog userDialog;
+    private readonly IThemeService themeService;
     private AppSettings savedSettings = AppSettings.CreateDefault();
     private CancellationTokenSource? synchronizationCancellation;
     private string? sourcePath;
     private string? destinationPath;
     private SyncMode mode;
+    private AppTheme theme = AppTheme.System;
     private string exclusionsText = string.Empty;
     private string logDirectory = AppPaths.DefaultLogDirectory;
     private string ssdStatus = "Non configurato";
@@ -43,7 +45,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         PathSafetyValidator pathSafetyValidator,
         IRobocopyRunner robocopyRunner,
         IFolderPicker folderPicker,
-        IUserDialog userDialog)
+        IUserDialog userDialog,
+        IThemeService themeService)
     {
         this.configurationStore = configurationStore;
         this.driveDetectionService = driveDetectionService;
@@ -51,6 +54,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         this.robocopyRunner = robocopyRunner;
         this.folderPicker = folderPicker;
         this.userDialog = userDialog;
+        this.themeService = themeService;
 
         ShowDashboardCommand = new(() => IsSettingsPageVisible = false);
         ShowSettingsCommand = new(() => IsSettingsPageVisible = true);
@@ -87,6 +91,24 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     public string ApplicationVersion { get; } = GetApplicationVersion();
 
+    public bool UseSystemTheme
+    {
+        get => Theme == AppTheme.System;
+        set { if (value) Theme = AppTheme.System; }
+    }
+
+    public bool UseLightTheme
+    {
+        get => Theme == AppTheme.Light;
+        set { if (value) Theme = AppTheme.Light; }
+    }
+
+    public bool UseDarkTheme
+    {
+        get => Theme == AppTheme.Dark;
+        set { if (value) Theme = AppTheme.Dark; }
+    }
+
     public string? SourcePath
     {
         get => sourcePath;
@@ -107,6 +129,21 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             if (SetProperty(ref mode, value))
             {
                 OnPropertyChanged(nameof(ModeSummary));
+            }
+        }
+    }
+
+    public AppTheme Theme
+    {
+        get => theme;
+        set
+        {
+            if (SetProperty(ref theme, value))
+            {
+                themeService.Apply(value);
+                OnPropertyChanged(nameof(UseSystemTheme));
+                OnPropertyChanged(nameof(UseLightTheme));
+                OnPropertyChanged(nameof(UseDarkTheme));
             }
         }
     }
@@ -376,6 +413,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     private void ApplySettings(AppSettings settings)
     {
+        themeService.Apply(settings.Theme);
+        Theme = settings.Theme;
         SourcePath = settings.SourcePath;
         DestinationPath = settings.DestinationPath;
         Mode = settings.Mode;
@@ -395,6 +434,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         SourcePath = SourcePath,
         DestinationPath = DestinationPath,
         Mode = Mode,
+        Theme = Theme,
         Exclusions = ExclusionsText
             .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Distinct(StringComparer.OrdinalIgnoreCase)

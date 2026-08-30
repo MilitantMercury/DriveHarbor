@@ -30,6 +30,7 @@ public sealed class JsonConfigurationStoreTests
             SourcePath = @"E:\Media",
             DestinationPath = @"C:\OneDrive\Media",
             Mode = SyncMode.Mirror,
+            Theme = AppTheme.Dark,
             SourceDrive = new DriveFingerprint
             {
                 VolumeGuidPath = @"\\?\Volume{11111111-1111-1111-1111-111111111111}\",
@@ -46,6 +47,7 @@ public sealed class JsonConfigurationStoreTests
         Assert.Equal(expected.SourcePath, result.Settings.SourcePath);
         Assert.Equal(expected.DestinationPath, result.Settings.DestinationPath);
         Assert.Equal(expected.Mode, result.Settings.Mode);
+        Assert.Equal(expected.Theme, result.Settings.Theme);
         Assert.Equal(expected.SourceDrive, result.Settings.SourceDrive);
         Assert.Equal(expected.Exclusions, result.Settings.Exclusions);
         Assert.Empty(Directory.EnumerateFiles(temporaryDirectory.FullPath, "*.tmp"));
