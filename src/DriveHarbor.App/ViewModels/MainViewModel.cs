@@ -28,6 +28,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private readonly IThemeService themeService;
     private readonly IUpdateChecker updateChecker;
     private readonly IUpdateDownloader updateDownloader;
+    private readonly IUpdateInstaller updateInstaller;
     private AppSettings savedSettings = AppSettings.CreateDefault();
     private CancellationTokenSource? synchronizationCancellation;
     private string? sourcePath;
@@ -57,7 +58,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         IUserDialog userDialog,
         IThemeService themeService,
         IUpdateChecker updateChecker,
-        IUpdateDownloader updateDownloader)
+        IUpdateDownloader updateDownloader,
+        IUpdateInstaller updateInstaller)
     {
         this.configurationStore = configurationStore;
         this.driveDetectionService = driveDetectionService;
@@ -68,6 +70,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         this.themeService = themeService;
         this.updateChecker = updateChecker;
         this.updateDownloader = updateDownloader;
+        this.updateInstaller = updateInstaller;
 
         ShowDashboardCommand = new(() => IsSettingsPageVisible = false);
         ShowSettingsCommand = new(() => IsSettingsPageVisible = true);
@@ -607,7 +610,17 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         var result = await updateDownloader.DownloadAsync(lastAvailableUpdate!);
         if (result.Succeeded)
         {
-            userDialog.ShowInformation("Aggiornamento pronto", $"{result.UserMessage}\n\n{result.PackagePath}\n\nL'installazione automatica sarà aggiunta nel prossimo incremento.");
+            if (userDialog.Confirm("Installare l'aggiornamento?", $"{result.UserMessage}\n\nDriveHarbor verrà chiuso, aggiornato e riaperto. Continuare?"))
+            {
+                if (updateInstaller.TryStart(result.PackagePath!, out var errorMessage))
+                {
+                    Application.Current.Shutdown();
+                }
+                else
+                {
+                    userDialog.ShowError("Aggiornamento", errorMessage!);
+                }
+            }
         }
         else
         {

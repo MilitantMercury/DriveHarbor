@@ -34,7 +34,8 @@ public partial class App : Application, IDisposable
             new UserDialog(),
             themeService,
             new GitHubUpdateChecker(new HttpClient()),
-            new VerifiedUpdateDownloader(new HttpClient(), AppPaths.UpdatesDirectory));
+            new VerifiedUpdateDownloader(new HttpClient(), AppPaths.UpdatesDirectory),
+            new SelfUpdateInstaller());
 
         var window = new MainWindow(mainViewModel);
         MainWindow = window;
