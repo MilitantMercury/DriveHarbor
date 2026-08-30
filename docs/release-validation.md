@@ -1,4 +1,4 @@
-# Validazione release 0.1.0
+# Validazione release
 
 ## Ambito automatizzato
 
@@ -34,3 +34,15 @@ Restano intenzionalmente manuali i test della UI, l'annullamento durante una
 copia di dimensioni realistiche, lo scollegamento fisico dell'SSD, la scansione
 antivirus, la firma e la verifica su un'installazione Windows 11 pulita. Questi
 punti non devono essere marcati come completati sulla sola base della CI.
+
+## Provenienza del pacchetto
+
+Il workflow associato ai tag genera una build provenance firmata tramite
+Sigstore e GitHub OIDC per lo ZIP Windows x64. L'attestazione lega il digest del
+pacchetto al repository, al commit, al tag e al workflow che lo ha prodotto. Il
+bundle viene allegato alla draft release e GitHub conserva la stessa
+attestazione nel proprio servizio.
+
+Il checksum rileva corruzioni accidentali; la verifica dell'attestazione è il
+controllo necessario per stabilire la provenienza della build. Non equivale a
+una firma Authenticode e non rimuove gli avvisi SmartScreen.

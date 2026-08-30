@@ -26,9 +26,11 @@ stati verificati manualmente.
 
 - [ ] Artifact sottoposto a scansione antivirus.
 - [ ] Hash SHA-256 allegato automaticamente alla release e verificato sullo ZIP scaricato.
+- [ ] Attestazione verificata per lo ZIP con repository `MilitantMercury/DriveHarbor`.
 - [ ] Firma del codice applicata, oppure assenza della firma dichiarata.
 - [ ] Draft release revisionata manualmente prima della pubblicazione.
 
 Il workflow associato ai tag `v*` crea deliberatamente una release in stato
-**draft pre-release**. Lo ZIP e il relativo file `.sha256` vengono allegati
-insieme; la pubblicazione resta sempre un'azione manuale.
+**draft pre-release**. Lo ZIP, il file `.sha256` e il bundle
+`.sigstore.json` vengono allegati insieme; la pubblicazione resta sempre
+un'azione manuale.
