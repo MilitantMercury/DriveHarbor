@@ -220,8 +220,9 @@ scelta dell'utente.
 
 Il download avviene in `%LocalAppData%\DriveHarbor\Updates`, accetta pacchetti
 fino a 250 MB e completa il salvataggio soltanto quando il digest SHA-256
-corrisponde a quello pubblicato. La sostituzione automatica dei file non è
-ancora abilitata.
+corrisponde a quello pubblicato. Dopo una seconda conferma, un updater separato
+chiude DriveHarbor, conserva i file che sostituirà, applica il pacchetto e
+riavvia l'app. In caso di errore durante la copia ripristina i file precedenti.
 
 ## Avvertenze
 

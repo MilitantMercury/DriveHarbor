@@ -14,6 +14,7 @@ Il progetto segue il versionamento semantico.
 - Controllo aggiornamenti manuale e giornaliero con canali Stabile e Beta.
 - Download atomico degli aggiornamenti con limite dimensione e verifica SHA-256.
 - Workflow GitHub Actions aggiornati ai runtime Node.js 24.
+- Updater self-contained con conferma, riavvio e ripristino su errore.
 
 ## [1.0.0-beta.1] - 2026-08-29
 

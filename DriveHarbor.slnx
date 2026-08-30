@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/DriveHarbor.App/DriveHarbor.App.csproj" />
     <Project Path="src/DriveHarbor.Core/DriveHarbor.Core.csproj" />
+    <Project Path="src/DriveHarbor.Updater/DriveHarbor.Updater.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/DriveHarbor.Core.Tests/DriveHarbor.Core.Tests.csproj" />
