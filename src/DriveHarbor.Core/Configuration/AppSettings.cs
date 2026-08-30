@@ -1,5 +1,7 @@
 namespace DriveHarbor.Core.Configuration;
 
+using DriveHarbor.Core.Updates;
+
 public sealed record AppSettings
 {
     public const int CurrentSchemaVersion = 1;
@@ -13,6 +15,10 @@ public sealed record AppSettings
     public SyncMode Mode { get; init; } = SyncMode.Backup;
 
     public AppTheme Theme { get; init; } = AppTheme.System;
+
+    public UpdateChannel UpdateChannel { get; init; } = UpdateChannel.Stable;
+
+    public DateTimeOffset? LastUpdateCheckUtc { get; init; }
 
     public DriveFingerprint? SourceDrive { get; init; }
 

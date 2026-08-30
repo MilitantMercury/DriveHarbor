@@ -106,6 +106,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid>
@@ -150,7 +151,16 @@
                     </Border>
                 </Grid>
 
-                <Border Grid.Row="2" Style="{StaticResource Card}" Margin="0,0,0,18">
+                <Border Grid.Row="2" Margin="0,0,0,18" Padding="16" CornerRadius="8" Background="#1677FF"
+                        Visibility="{Binding UpdateVisibility}">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Margin="16,0,0,0" Style="{StaticResource SecondaryButton}"
+                                Command="{Binding OpenUpdateCommand}" Content="Apri download" />
+                        <TextBlock VerticalAlignment="Center" Foreground="White" FontWeight="SemiBold" Text="{Binding UpdateMessage}" />
+                    </DockPanel>
+                </Border>
+
+                <Border Grid.Row="3" Style="{StaticResource Card}" Margin="0,0,0,18">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*" />
@@ -172,7 +182,7 @@
                     </Grid>
                 </Border>
 
-                <Border Grid.Row="3" Style="{StaticResource Card}" Padding="0">
+                <Border Grid.Row="4" Style="{StaticResource Card}" Padding="0">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -263,6 +273,17 @@
                             </StackPanel>
                             <TextBlock Margin="0,10,0,0" Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap"
                                        Text="Sistema segue automaticamente il tema delle app configurato in Windows." />
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,18">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Aggiornamenti" />
+                            <ComboBox Width="260" HorizontalAlignment="Left" Padding="10,8"
+                                      ItemsSource="{Binding AvailableUpdateChannels}" SelectedItem="{Binding UpdateChannel}" />
+                            <TextBlock Margin="0,10,0,12" Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap"
+                                       Text="Stabile ignora le versioni beta. Beta propone anche le anteprime pubblicate." />
+                            <Button HorizontalAlignment="Left" Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding CheckForUpdatesCommand}" Content="Controlla aggiornamenti" />
                         </StackPanel>
                     </Border>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

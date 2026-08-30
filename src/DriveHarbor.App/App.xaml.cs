@@ -1,9 +1,11 @@
+using System.Net.Http;
 using System.Windows;
 using DriveHarbor.App.Services;
 using DriveHarbor.App.ViewModels;
 using DriveHarbor.Core.Configuration;
 using DriveHarbor.Core.Drives;
 using DriveHarbor.Core.Robocopy;
+using DriveHarbor.Core.Updates;
 using DriveHarbor.Core.Validation;
 
 namespace DriveHarbor.App;
@@ -30,7 +32,8 @@ public partial class App : Application, IDisposable
             new RobocopyRunner(),
             new FolderPicker(),
             new UserDialog(),
-            themeService);
+            themeService,
+            new GitHubUpdateChecker(new HttpClient()));
 
         var window = new MainWindow(mainViewModel);
         MainWindow = window;

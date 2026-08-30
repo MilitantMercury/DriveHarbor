@@ -1,4 +1,5 @@
 using DriveHarbor.Core.Configuration;
+using DriveHarbor.Core.Updates;
 
 namespace DriveHarbor.Core.Tests.Configuration;
 
@@ -11,6 +12,7 @@ public sealed class AppSettingsTests
 
         Assert.Equal(SyncMode.Backup, settings.Mode);
         Assert.Equal(AppTheme.System, settings.Theme);
+        Assert.Equal(UpdateChannel.Stable, settings.UpdateChannel);
         Assert.Contains("$RECYCLE.BIN", settings.Exclusions);
         Assert.Contains("System Volume Information", settings.Exclusions);
         Assert.Contains("*.tmp", settings.Exclusions);

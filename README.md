@@ -212,6 +212,12 @@ multi-risoluzione per finestra, barra delle applicazioni ed eseguibile Windows.
 La versione mostrata nella barra laterale viene letta direttamente dai metadati
 dell'eseguibile, senza un valore separato scritto nell'interfaccia.
 
+DriveHarbor controlla al massimo una volta ogni 24 ore le release pubblicate su
+GitHub e mostra un avviso non invasivo quando trova una versione più recente.
+Il canale Stabile ignora le pre-release; il canale Beta le include. Il controllo
+manuale è disponibile nelle Impostazioni e l'installazione resta sempre una
+scelta dell'utente.
+
 ## Avvertenze
 
 - La modalità Mirror può eliminare file esclusivamente dalla destinazione.

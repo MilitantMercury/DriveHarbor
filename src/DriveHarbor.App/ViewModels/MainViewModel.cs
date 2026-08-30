@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
 using System.Windows;
 using DriveHarbor.App.Infrastructure;
@@ -10,6 +12,7 @@ using DriveHarbor.Core.Drives;
 using DriveHarbor.Core.Logging;
 using DriveHarbor.Core.Robocopy;
 using DriveHarbor.Core.Synchronization;
+using DriveHarbor.Core.Updates;
 using DriveHarbor.Core.Validation;
 
 namespace DriveHarbor.App.ViewModels;
@@ -23,12 +26,16 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private readonly IFolderPicker folderPicker;
     private readonly IUserDialog userDialog;
     private readonly IThemeService themeService;
+    private readonly IUpdateChecker updateChecker;
     private AppSettings savedSettings = AppSettings.CreateDefault();
     private CancellationTokenSource? synchronizationCancellation;
     private string? sourcePath;
     private string? destinationPath;
     private SyncMode mode;
     private AppTheme theme = AppTheme.System;
+    private UpdateChannel updateChannel = UpdateChannel.Stable;
+    private Uri? updateUri;
+    private string updateMessage = string.Empty;
     private string exclusionsText = string.Empty;
     private string logDirectory = AppPaths.DefaultLogDirectory;
     private string ssdStatus = "Non configurato";
@@ -46,7 +53,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         IRobocopyRunner robocopyRunner,
         IFolderPicker folderPicker,
         IUserDialog userDialog,
-        IThemeService themeService)
+        IThemeService themeService,
+        IUpdateChecker updateChecker)
     {
         this.configurationStore = configurationStore;
         this.driveDetectionService = driveDetectionService;
@@ -55,6 +63,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         this.folderPicker = folderPicker;
         this.userDialog = userDialog;
         this.themeService = themeService;
+        this.updateChecker = updateChecker;
 
         ShowDashboardCommand = new(() => IsSettingsPageVisible = false);
         ShowSettingsCommand = new(() => IsSettingsPageVisible = true);
@@ -65,6 +74,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         SaveSettingsCommand = new(SaveSettingsAsync, () => !IsBusy, HandleUnexpectedError);
         SynchronizeCommand = new(SynchronizeAsync, CanSynchronize, HandleUnexpectedError);
         CancelCommand = new(CancelSynchronization, () => IsBusy);
+        CheckForUpdatesCommand = new(() => CheckForUpdatesAsync(true), () => !IsBusy, HandleUnexpectedError);
+        OpenUpdateCommand = new(OpenUpdate, () => updateUri is not null);
     }
 
     public RelayCommand ShowDashboardCommand { get; }
@@ -85,11 +96,31 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     public RelayCommand CancelCommand { get; }
 
+    public AsyncRelayCommand CheckForUpdatesCommand { get; }
+
+    public RelayCommand OpenUpdateCommand { get; }
+
     public ObservableCollection<string> LogLines { get; } = [];
 
     public IReadOnlyList<SyncMode> AvailableModes { get; } = Enum.GetValues<SyncMode>();
 
     public string ApplicationVersion { get; } = GetApplicationVersion();
+
+    public IReadOnlyList<UpdateChannel> AvailableUpdateChannels { get; } = Enum.GetValues<UpdateChannel>();
+
+    public UpdateChannel UpdateChannel
+    {
+        get => updateChannel;
+        set => SetProperty(ref updateChannel, value);
+    }
+
+    public string UpdateMessage
+    {
+        get => updateMessage;
+        private set => SetProperty(ref updateMessage, value);
+    }
+
+    public Visibility UpdateVisibility => updateUri is null ? Visibility.Collapsed : Visibility.Visible;
 
     public bool UseSystemTheme
     {
@@ -235,6 +266,12 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         if (!string.IsNullOrWhiteSpace(loadResult.UserMessage))
         {
             userDialog.ShowInformation("Configurazione", loadResult.UserMessage);
+        }
+
+        if (savedSettings.LastUpdateCheckUtc is null
+            || DateTimeOffset.UtcNow - savedSettings.LastUpdateCheckUtc >= TimeSpan.FromHours(24))
+        {
+            await CheckForUpdatesAsync(false);
         }
     }
 
@@ -415,6 +452,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     {
         themeService.Apply(settings.Theme);
         Theme = settings.Theme;
+        UpdateChannel = settings.UpdateChannel;
         SourcePath = settings.SourcePath;
         DestinationPath = settings.DestinationPath;
         Mode = settings.Mode;
@@ -435,6 +473,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         DestinationPath = DestinationPath,
         Mode = Mode,
         Theme = Theme,
+        UpdateChannel = UpdateChannel,
         Exclusions = ExclusionsText
             .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -497,6 +536,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         SaveSettingsCommand.NotifyCanExecuteChanged();
         SynchronizeCommand.NotifyCanExecuteChanged();
         CancelCommand.NotifyCanExecuteChanged();
+        CheckForUpdatesCommand.NotifyCanExecuteChanged();
     }
 
     private void HandleUnexpectedError(Exception exception)
@@ -515,4 +555,44 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         var version = informationalVersion?.Split('+', 2)[0];
         return $"Versione {version ?? "non disponibile"}";
     }
+
+    private async Task CheckForUpdatesAsync(bool showCurrentMessage)
+    {
+        try
+        {
+            var result = await updateChecker.CheckAsync(GetRawApplicationVersion(), UpdateChannel);
+            savedSettings = savedSettings with { LastUpdateCheckUtc = DateTimeOffset.UtcNow };
+            await configurationStore.SaveAsync(savedSettings);
+            if (result.IsAvailable)
+            {
+                updateUri = result.ReleaseUri;
+                UpdateMessage = $"È disponibile DriveHarbor {result.Version}.";
+                OnPropertyChanged(nameof(UpdateVisibility));
+                OpenUpdateCommand.NotifyCanExecuteChanged();
+            }
+            else if (showCurrentMessage)
+            {
+                userDialog.ShowInformation("Aggiornamenti", "Stai usando la versione più recente del canale selezionato.");
+            }
+        }
+        catch (HttpRequestException) when (!showCurrentMessage)
+        {
+        }
+        catch (HttpRequestException exception)
+        {
+            userDialog.ShowError("Aggiornamenti", $"Impossibile controllare gli aggiornamenti. {exception.Message}");
+        }
+    }
+
+    private void OpenUpdate()
+    {
+        if (updateUri is { Scheme: "https", Host: "github.com" })
+        {
+            Process.Start(new ProcessStartInfo(updateUri.AbsoluteUri) { UseShellExecute = true });
+        }
+    }
+
+    private static string GetRawApplicationVersion() => Assembly.GetEntryAssembly()?
+        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+        .InformationalVersion.Split('+', 2)[0] ?? "0.0.0";
 }
