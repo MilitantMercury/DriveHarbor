@@ -44,6 +44,9 @@ più lungo:
 2. anteprima Robocopy senza modifiche;
 3. nuova conferma esplicita prima dell'esecuzione reale.
 
+La pagina Impostazioni confronta direttamente Backup e Mirror e chiarisce quali
+file restano o vengono eliminati dalla destinazione prima della selezione.
+
 ## Configurazione locale
 
 Le impostazioni vengono salvate in:

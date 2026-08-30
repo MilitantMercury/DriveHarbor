@@ -137,7 +137,7 @@
                         <StackPanel>
                             <TextBlock Foreground="#74879A" Text="MODALITÀ" />
                             <TextBlock Margin="0,9,0,0" Foreground="#172B42" FontSize="18" FontWeight="SemiBold" Text="{Binding Mode}" />
-                            <TextBlock Margin="0,7,0,0" Foreground="#60758A" Text="Backup è la scelta conservativa" />
+                            <TextBlock Margin="0,7,0,0" Foreground="#60758A" TextWrapping="Wrap" Text="{Binding ModeSummary}" />
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -203,9 +203,29 @@
                         <StackPanel>
                             <TextBlock Style="{StaticResource FieldLabel}" Text="Modalità" />
                             <ComboBox Width="260" HorizontalAlignment="Left" Padding="10,8" ItemsSource="{Binding AvailableModes}" SelectedItem="{Binding Mode}" />
-                            <Border Margin="0,12,0,0" Padding="12" Background="#FFF6E5" CornerRadius="6">
-                                <TextBlock Foreground="#78510A" TextWrapping="Wrap" Text="Backup non elimina file. Mirror può eliminare soltanto dalla destinazione e richiede conferme esplicite." />
-                            </Border>
+                            <Grid Margin="0,14,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="12" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Border Padding="14" Background="#EAF7EF" CornerRadius="7">
+                                    <StackPanel>
+                                        <TextBlock Foreground="#17633A" FontWeight="SemiBold" Text="Backup — consigliato" />
+                                        <TextBlock Margin="0,7,0,0" Foreground="#285A40" TextWrapping="Wrap"
+                                                   Text="Copia i file nuovi e aggiornati dall’SSD. I file presenti soltanto su OneDrive rimangono al loro posto." />
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="2" Padding="14" Background="#FFF1E8" CornerRadius="7">
+                                    <StackPanel>
+                                        <TextBlock Foreground="#8A3D12" FontWeight="SemiBold" Text="Mirror — attenzione" />
+                                        <TextBlock Margin="0,7,0,0" Foreground="#73401F" TextWrapping="Wrap"
+                                                   Text="Rende OneDrive identico all’SSD. I file presenti soltanto nella destinazione vengono eliminati dopo anteprima e conferma." />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                            <TextBlock Margin="0,11,0,0" Foreground="#60758A" TextWrapping="Wrap"
+                                       Text="DriveHarbor non elimina mai file dalla sorgente SSD. Usa Mirror solo se disponi di un’altra copia dei dati." />
                             <TextBlock Margin="0,20,0,7" Style="{StaticResource FieldLabel}" Text="Esclusioni (un pattern o una cartella per riga)" />
                             <TextBox MinHeight="110" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Style="{StaticResource TextField}"
                                      Text="{Binding ExclusionsText, UpdateSourceTrigger=PropertyChanged}" />
