@@ -218,6 +218,11 @@ Il canale Stabile ignora le pre-release; il canale Beta le include. Il controllo
 manuale è disponibile nelle Impostazioni e l'installazione resta sempre una
 scelta dell'utente.
 
+Il download avviene in `%LocalAppData%\DriveHarbor\Updates`, accetta pacchetti
+fino a 250 MB e completa il salvataggio soltanto quando il digest SHA-256
+corrisponde a quello pubblicato. La sostituzione automatica dei file non è
+ancora abilitata.
+
 ## Avvertenze
 
 - La modalità Mirror può eliminare file esclusivamente dalla destinazione.

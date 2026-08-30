@@ -27,6 +27,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private readonly IUserDialog userDialog;
     private readonly IThemeService themeService;
     private readonly IUpdateChecker updateChecker;
+    private readonly IUpdateDownloader updateDownloader;
     private AppSettings savedSettings = AppSettings.CreateDefault();
     private CancellationTokenSource? synchronizationCancellation;
     private string? sourcePath;
@@ -35,6 +36,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private AppTheme theme = AppTheme.System;
     private UpdateChannel updateChannel = UpdateChannel.Stable;
     private Uri? updateUri;
+    private UpdateCheckResult? lastAvailableUpdate;
     private string updateMessage = string.Empty;
     private string exclusionsText = string.Empty;
     private string logDirectory = AppPaths.DefaultLogDirectory;
@@ -54,7 +56,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         IFolderPicker folderPicker,
         IUserDialog userDialog,
         IThemeService themeService,
-        IUpdateChecker updateChecker)
+        IUpdateChecker updateChecker,
+        IUpdateDownloader updateDownloader)
     {
         this.configurationStore = configurationStore;
         this.driveDetectionService = driveDetectionService;
@@ -64,6 +67,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         this.userDialog = userDialog;
         this.themeService = themeService;
         this.updateChecker = updateChecker;
+        this.updateDownloader = updateDownloader;
 
         ShowDashboardCommand = new(() => IsSettingsPageVisible = false);
         ShowSettingsCommand = new(() => IsSettingsPageVisible = true);
@@ -76,6 +80,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         CancelCommand = new(CancelSynchronization, () => IsBusy);
         CheckForUpdatesCommand = new(() => CheckForUpdatesAsync(true), () => !IsBusy, HandleUnexpectedError);
         OpenUpdateCommand = new(OpenUpdate, () => updateUri is not null);
+        DownloadUpdateCommand = new(DownloadUpdateAsync, () => updateUri is not null && !IsBusy, HandleUnexpectedError);
     }
 
     public RelayCommand ShowDashboardCommand { get; }
@@ -99,6 +104,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     public AsyncRelayCommand CheckForUpdatesCommand { get; }
 
     public RelayCommand OpenUpdateCommand { get; }
+
+    public AsyncRelayCommand DownloadUpdateCommand { get; }
 
     public ObservableCollection<string> LogLines { get; } = [];
 
@@ -537,6 +544,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         SynchronizeCommand.NotifyCanExecuteChanged();
         CancelCommand.NotifyCanExecuteChanged();
         CheckForUpdatesCommand.NotifyCanExecuteChanged();
+        DownloadUpdateCommand.NotifyCanExecuteChanged();
     }
 
     private void HandleUnexpectedError(Exception exception)
@@ -566,9 +574,11 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             if (result.IsAvailable)
             {
                 updateUri = result.ReleaseUri;
+                lastAvailableUpdate = result;
                 UpdateMessage = $"È disponibile DriveHarbor {result.Version}.";
                 OnPropertyChanged(nameof(UpdateVisibility));
                 OpenUpdateCommand.NotifyCanExecuteChanged();
+                DownloadUpdateCommand.NotifyCanExecuteChanged();
             }
             else if (showCurrentMessage)
             {
@@ -589,6 +599,19 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         if (updateUri is { Scheme: "https", Host: "github.com" })
         {
             Process.Start(new ProcessStartInfo(updateUri.AbsoluteUri) { UseShellExecute = true });
+        }
+    }
+
+    private async Task DownloadUpdateAsync()
+    {
+        var result = await updateDownloader.DownloadAsync(lastAvailableUpdate!);
+        if (result.Succeeded)
+        {
+            userDialog.ShowInformation("Aggiornamento pronto", $"{result.UserMessage}\n\n{result.PackagePath}\n\nL'installazione automatica sarà aggiunta nel prossimo incremento.");
+        }
+        else
+        {
+            userDialog.ShowError("Aggiornamento rifiutato", result.UserMessage);
         }
     }
 
