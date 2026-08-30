@@ -11,6 +11,7 @@ Il progetto segue il versionamento semantico.
 - Logo originale, icona Windows multi-risoluzione e versione reale mostrata nell'app.
 - Tema Sistema, Chiaro o Scuro con aggiornamento automatico dal tema di Windows.
 - Attestazione Sigstore della provenienza per ogni archivio di release.
+- Controllo aggiornamenti manuale e giornaliero con canali Stabile e Beta.
 
 ## [1.0.0-beta.1] - 2026-08-29
 
