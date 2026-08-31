@@ -9,6 +9,7 @@ Il progetto segue il versionamento semantico.
 
 - Il pannello attività mostra un riepilogo comprensibile dei file sincronizzati, mantenuti, eliminati ed eventuali errori.
 - La decodifica OEM di Robocopy evita caratteri italiani visualizzati con codifica errata.
+- Rimossi dalla barra laterale i testi ridondanti sul funzionamento locale e sulla telemetria.
 
 ## [1.0.0] - 2026-08-31
 
