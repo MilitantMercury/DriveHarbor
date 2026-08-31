@@ -37,7 +37,9 @@ Consulta la [roadmap](docs/roadmap.md) per la sequenza prevista.
 La dashboard mostra stato SSD e OneDrive, modalità, ultima sincronizzazione,
 ultimo risultato e un riepilogo leggibile dell'attività. Al termine indica file
 esaminati, aggiunti o aggiornati, già sincronizzati, eliminati ed eventuali
-errori; il log tecnico completo resta disponibile nei file locali. La pagina Impostazioni permette di
+errori; il log tecnico completo resta disponibile nei file locali. Il pulsante
+**Esporta log** crea dalla dashboard un archivio ZIP contenente soltanto i file
+`.log`, senza impostazioni o dati sincronizzati. La pagina Impostazioni permette di
 selezionare sorgente, destinazione, modalità, esclusioni e posizione dei log.
 I pannelli SSD e OneDrive diventano verdi quando la risorsa è disponibile e
 rossi quando non lo è; il pulsante di sincronizzazione resta disabilitato finché

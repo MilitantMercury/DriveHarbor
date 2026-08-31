@@ -50,3 +50,5 @@ annidati, junction e destinazioni esterne a OneDrive vengono rifiutati.
 
 I log restano locali e non registrano il contenuto dei file. Possono comunque
 contenere nomi e percorsi: rimuovi queste informazioni prima di condividerli.
+L'esportazione dall'app include soltanto file `.log`, ma non anonimizza nomi e
+percorsi presenti al loro interno.

@@ -221,7 +221,11 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Border Padding="18,14" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
-                            <TextBlock Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" Text="Attività sincronizzazione" />
+                            <DockPanel>
+                                <Button DockPanel.Dock="Right" Padding="12,6" Style="{StaticResource SecondaryButton}"
+                                        Command="{Binding ExportLogsCommand}" Content="Esporta log" />
+                                <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" Text="Attività sincronizzazione" />
+                            </DockPanel>
                         </Border>
                         <ListBox Grid.Row="1" ItemsSource="{Binding LogLines}" BorderThickness="0" Background="{DynamicResource LogBackgroundBrush}" Foreground="{DynamicResource PrimaryTextBrush}"
                                  Padding="18,12" FontFamily="Segoe UI" FontSize="13" ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
