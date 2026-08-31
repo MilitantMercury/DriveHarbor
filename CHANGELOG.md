@@ -5,6 +5,10 @@ Il progetto segue il versionamento semantico.
 
 ## [Unreleased]
 
+### Added
+
+- Esportazione dei log dalla dashboard in un archivio ZIP che esclude impostazioni e altri dati locali.
+
 ## [1.0.2] - 2026-08-31
 
 ### Fixed

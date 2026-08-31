@@ -88,6 +88,11 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         BrowseSourceCommand = new(BrowseSource);
         BrowseDestinationCommand = new(BrowseDestination);
         BrowseLogDirectoryCommand = new(BrowseLogDirectory);
+        ExportLogsCommand = new(() =>
+        {
+            try { ExportLogs(); }
+            catch (Exception exception) { HandleUnexpectedError(exception); }
+        }, () => !IsBusy);
         SaveSettingsCommand = new(SaveSettingsAsync, () => !IsBusy, HandleUnexpectedError);
         SynchronizeCommand = new(SynchronizeAsync, CanSynchronize, HandleUnexpectedError);
         CancelCommand = new(CancelSynchronization, () => IsBusy || autoSyncDelayCancellation is not null);
@@ -107,6 +112,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     public RelayCommand BrowseDestinationCommand { get; }
 
     public RelayCommand BrowseLogDirectoryCommand { get; }
+
+    public RelayCommand ExportLogsCommand { get; }
 
     public AsyncRelayCommand SaveSettingsCommand { get; }
 
@@ -406,6 +413,27 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         {
             LogDirectory = selected;
         }
+    }
+
+    private void ExportLogs()
+    {
+        var defaultName = $"DriveHarbor-logs-{DateTime.Now:yyyyMMdd-HHmmss}.zip";
+        var destination = folderPicker.PickSaveFile(
+            "Esporta i log di DriveHarbor",
+            defaultName,
+            "Archivio ZIP (*.zip)|*.zip");
+        if (destination is null) return;
+
+        var exportedFiles = LogArchiveExporter.Export(savedSettings.LogDirectory, destination);
+        if (exportedFiles == 0)
+        {
+            userDialog.ShowInformation("Esporta log", "Non ci sono ancora file di log da esportare.");
+            return;
+        }
+
+        userDialog.ShowInformation(
+            "Esportazione completata",
+            $"Creato l'archivio con {exportedFiles} file di log.\n\n{destination}");
     }
 
     private async Task SaveSettingsAsync()
@@ -724,6 +752,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         CancelCommand.NotifyCanExecuteChanged();
         CheckForUpdatesCommand.NotifyCanExecuteChanged();
         DownloadUpdateCommand.NotifyCanExecuteChanged();
+        ExportLogsCommand.NotifyCanExecuteChanged();
     }
 
     private void HandleUnexpectedError(Exception exception)
