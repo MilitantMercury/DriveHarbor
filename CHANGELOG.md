@@ -5,6 +5,8 @@ Il progetto segue il versionamento semantico.
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-08-31
+
 ### Fixed
 
 - L'updater richiede UAC per installazioni in cartelle protette, riapre l'app dopo errori o rollback e mostra l'esito dell'operazione.
