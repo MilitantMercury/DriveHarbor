@@ -20,5 +20,11 @@
         <SolidColorBrush x:Key="BackupTextBrush" Color="#17633A" />
         <SolidColorBrush x:Key="MirrorPanelBrush" Color="#FFF1E8" />
         <SolidColorBrush x:Key="MirrorTextBrush" Color="#8A3D12" />
+        <SolidColorBrush x:Key="AvailablePanelBrush" Color="#E8F7EE" />
+        <SolidColorBrush x:Key="AvailableBorderBrush" Color="#75C794" />
+        <SolidColorBrush x:Key="AvailableTextBrush" Color="#17633A" />
+        <SolidColorBrush x:Key="UnavailablePanelBrush" Color="#FDECEC" />
+        <SolidColorBrush x:Key="UnavailableBorderBrush" Color="#E39898" />
+        <SolidColorBrush x:Key="UnavailableTextBrush" Color="#9B2525" />
     </Application.Resources>
 </Application>

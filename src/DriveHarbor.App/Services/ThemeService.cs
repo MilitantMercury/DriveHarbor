@@ -57,6 +57,12 @@ public sealed class ThemeService : IThemeService, IDisposable
         SetBrush("BackupTextBrush", dark ? "#8ED8AE" : "#17633A");
         SetBrush("MirrorPanelBrush", dark ? "#3A251A" : "#FFF1E8");
         SetBrush("MirrorTextBrush", dark ? "#F1B48D" : "#8A3D12");
+        SetBrush("AvailablePanelBrush", dark ? "#173426" : "#E8F7EE");
+        SetBrush("AvailableBorderBrush", dark ? "#3F815A" : "#75C794");
+        SetBrush("AvailableTextBrush", dark ? "#8ED8AE" : "#17633A");
+        SetBrush("UnavailablePanelBrush", dark ? "#3B2022" : "#FDECEC");
+        SetBrush("UnavailableBorderBrush", dark ? "#85484B" : "#E39898");
+        SetBrush("UnavailableTextBrush", dark ? "#F2A4A4" : "#9B2525");
     }
 
     private void OnUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)

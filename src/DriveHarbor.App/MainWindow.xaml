@@ -52,6 +52,26 @@
             <Setter Property="CornerRadius" Value="10" />
             <Setter Property="Padding" Value="20" />
         </Style>
+        <Style x:Key="StatusCard" TargetType="Border" BasedOn="{StaticResource Card}">
+            <Setter Property="Background" Value="{DynamicResource UnavailablePanelBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource UnavailableBorderBrush}" />
+            <Style.Triggers>
+                <Trigger Property="Tag" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource AvailablePanelBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource AvailableBorderBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StatusValue" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource UnavailableTextBrush}" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Style.Triggers>
+                <Trigger Property="Tag" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource AvailableTextBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         <Style x:Key="FieldLabel" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource FieldTextBrush}" />
             <Setter Property="FontWeight" Value="SemiBold" />
@@ -126,17 +146,17 @@
                         <ColumnDefinition Width="16" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <Border Style="{StaticResource Card}">
+                    <Border Style="{StaticResource StatusCard}" Tag="{Binding IsSsdAvailable}">
                         <StackPanel>
                             <TextBlock Foreground="{DynamicResource MutedTextBrush}" Text="STATO SSD" />
-                            <TextBlock Margin="0,9,0,0" Foreground="{DynamicResource PrimaryTextBrush}" FontSize="18" FontWeight="SemiBold" Text="{Binding SsdStatus}" />
+                            <TextBlock Margin="0,9,0,0" Style="{StaticResource StatusValue}" Tag="{Binding IsSsdAvailable}" Text="{Binding SsdStatus}" />
                             <TextBlock Margin="0,7,0,0" Foreground="{DynamicResource SecondaryTextBrush}" TextTrimming="CharacterEllipsis" Text="{Binding SourcePath, TargetNullValue='Cartella non selezionata'}" />
                         </StackPanel>
                     </Border>
-                    <Border Grid.Column="2" Style="{StaticResource Card}">
+                    <Border Grid.Column="2" Style="{StaticResource StatusCard}" Tag="{Binding IsOneDriveAvailable}">
                         <StackPanel>
                             <TextBlock Foreground="{DynamicResource MutedTextBrush}" Text="ONEDRIVE" />
-                            <TextBlock Margin="0,9,0,0" Foreground="{DynamicResource PrimaryTextBrush}" FontSize="18" FontWeight="SemiBold" Text="{Binding OneDriveStatus}" />
+                            <TextBlock Margin="0,9,0,0" Style="{StaticResource StatusValue}" Tag="{Binding IsOneDriveAvailable}" Text="{Binding OneDriveStatus}" />
                             <TextBlock Margin="0,7,0,0" Foreground="{DynamicResource SecondaryTextBrush}" TextTrimming="CharacterEllipsis" Text="{Binding DestinationPath, TargetNullValue='Cartella non selezionata'}" />
                         </StackPanel>
                     </Border>
