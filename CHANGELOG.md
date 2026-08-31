@@ -5,6 +5,10 @@ Il progetto segue il versionamento semantico.
 
 ## [Unreleased]
 
+### Fixed
+
+- Corretto il crash all'avvio causato dal binding bidirezionale della barra di avanzamento verso una proprietà di sola lettura.
+
 ## [1.0.3] - 2026-08-31
 
 ### Added
