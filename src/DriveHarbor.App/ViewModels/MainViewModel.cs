@@ -45,6 +45,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private string logDirectory = AppPaths.DefaultLogDirectory;
     private string ssdStatus = "Non configurato";
     private string oneDriveStatus = "Non configurato";
+    private bool isSsdAvailable;
+    private bool isOneDriveAvailable;
     private string operationStatus = "Configura le cartelle per iniziare";
     private string lastSynchronization = "Mai";
     private string lastResult = "Nessuna sincronizzazione eseguita";
@@ -242,6 +244,18 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         private set => SetProperty(ref oneDriveStatus, value);
     }
 
+    public bool IsSsdAvailable
+    {
+        get => isSsdAvailable;
+        private set => SetProperty(ref isSsdAvailable, value);
+    }
+
+    public bool IsOneDriveAvailable
+    {
+        get => isOneDriveAvailable;
+        private set => SetProperty(ref isOneDriveAvailable, value);
+    }
+
     public string OperationStatus
     {
         get => operationStatus;
@@ -316,6 +330,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         var isFirstObservation = previousDriveStatus is null;
         var wasConnected = previousDriveStatus == DriveConnectionStatus.Connected;
         previousDriveStatus = drive.Status;
+        IsSsdAvailable = drive.Status == DriveConnectionStatus.Connected;
         SsdStatus = drive.Status switch
         {
             DriveConnectionStatus.Connected => "SSD collegato",
@@ -325,8 +340,9 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             _ => "SSD non configurato",
         };
 
-        OneDriveStatus = !string.IsNullOrWhiteSpace(savedSettings.DestinationPath)
-            && Directory.Exists(savedSettings.DestinationPath)
+        IsOneDriveAvailable = !string.IsNullOrWhiteSpace(savedSettings.DestinationPath)
+            && Directory.Exists(savedSettings.DestinationPath);
+        OneDriveStatus = IsOneDriveAvailable
                 ? "Cartella disponibile"
                 : "Destinazione non disponibile";
         if (drive.Status != DriveConnectionStatus.Connected)
@@ -555,6 +571,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     private bool CanSynchronize() =>
         !IsBusy
+        && IsSsdAvailable
+        && IsOneDriveAvailable
         && savedSettings.SourceDrive is not null
         && !string.IsNullOrWhiteSpace(savedSettings.SourcePath)
         && !string.IsNullOrWhiteSpace(savedSettings.DestinationPath);

@@ -10,6 +10,7 @@ Il progetto segue il versionamento semantico.
 - Il pannello attività mostra un riepilogo comprensibile dei file sincronizzati, mantenuti, eliminati ed eventuali errori.
 - La decodifica OEM di Robocopy evita caratteri italiani visualizzati con codifica errata.
 - Rimossi dalla barra laterale i testi ridondanti sul funzionamento locale e sulla telemetria.
+- I pannelli SSD e OneDrive indicano la disponibilità in verde o rosso e bloccano la sincronizzazione se una risorsa manca.
 
 ## [1.0.0] - 2026-08-31
 

@@ -39,6 +39,9 @@ ultimo risultato e un riepilogo leggibile dell'attività. Al termine indica file
 esaminati, aggiunti o aggiornati, già sincronizzati, eliminati ed eventuali
 errori; il log tecnico completo resta disponibile nei file locali. La pagina Impostazioni permette di
 selezionare sorgente, destinazione, modalità, esclusioni e posizione dei log.
+I pannelli SSD e OneDrive diventano verdi quando la risorsa è disponibile e
+rossi quando non lo è; il pulsante di sincronizzazione resta disabilitato finché
+entrambe non risultano disponibili.
 
 La UI resta reattiva mentre Robocopy lavora e offre l'annullamento. Lo stato dei
 volumi viene aggiornato periodicamente. Per Mirror il flusso è deliberatamente
