@@ -5,6 +5,8 @@ Il progetto segue il versionamento semantico.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-08-31
+
 ### Changed
 
 - Il pannello attività mostra un riepilogo comprensibile dei file sincronizzati, mantenuti, eliminati ed eventuali errori.
