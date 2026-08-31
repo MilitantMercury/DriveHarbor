@@ -5,6 +5,8 @@ Il progetto segue il versionamento semantico.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-08-31
+
 ### Added
 
 - Spiegazione in-app delle differenze e dei rischi di Backup e Mirror.

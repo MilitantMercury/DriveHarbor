@@ -7,8 +7,8 @@
 ![Screenshot placeholder](https://placehold.co/1200x675/13233A/FFFFFF?text=DriveHarbor+Dashboard)
 
 > [!IMPORTANT]
-> DriveHarbor è in sviluppo. Prima della prima release pubblica deve completare
-> la checklist manuale su directory di test isolate.
+> Prima di usare Mirror su dati importanti, verificare la configurazione con una
+> directory di prova e conservare sempre una copia indipendente.
 
 ## Cos'è DriveHarbor
 
@@ -25,7 +25,7 @@ richiede account aggiuntivi, non include telemetria e non invia dati all'esterno
 
 ## Stato del progetto
 
-La versione corrente è `1.0.0-beta.1`. Sono disponibili la foundation tecnica, il
+La versione corrente è `1.0.0`. Sono disponibili la foundation tecnica, il
 modello di configurazione locale e le regole di sicurezza dei percorsi. Le
 funzioni di rilevamento stabile del volume sorgente sono incluse; la copia vera
 e propria è collegata alla dashboard WPF tramite preflight conservativo. Le
@@ -135,7 +135,7 @@ l'operazione deve fermarsi.
 
 ## Requisiti
 
-### Per utilizzare una futura build self-contained
+### Per utilizzare la build self-contained
 
 - Windows 11 x64.
 - Client ufficiale OneDrive configurato.
@@ -178,12 +178,14 @@ dotnet publish src/DriveHarbor.App/DriveHarbor.App.csproj `
 ```
 
 La pipeline GitHub Actions esegue restore, build, test e produce un artifact
-self-contained per Windows x64. La pubblicazione non è ancora una release
-firmata né un installer.
+self-contained per Windows x64. Il pacchetto non usa ancora un installer o una
+firma Authenticode.
 
 I tag `v*` avviano un secondo workflow che crea archivio ZIP, checksum SHA-256,
-attestazione Sigstore della provenienza e GitHub Release in stato **draft
-pre-release**. Checksum e bundle `.sigstore.json` vengono allegati allo ZIP. La
+attestazione Sigstore della provenienza e GitHub Release in stato **draft**. I
+tag con suffisso, come `v1.1.0-beta.1`, vengono marcati come pre-release; i tag
+stabili, come `v1.0.0`, producono una release stabile. Checksum e bundle
+`.sigstore.json` vengono allegati allo ZIP. La
 provenienza può essere verificata con:
 
 ```powershell
