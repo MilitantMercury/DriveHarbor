@@ -29,8 +29,10 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private readonly IUpdateChecker updateChecker;
     private readonly IUpdateDownloader updateDownloader;
     private readonly IUpdateInstaller updateInstaller;
+    private readonly IStartupRegistrationService startupRegistrationService;
     private AppSettings savedSettings = AppSettings.CreateDefault();
     private CancellationTokenSource? synchronizationCancellation;
+    private SynchronizationCancellationReason synchronizationCancellationReason;
     private CancellationTokenSource? autoSyncDelayCancellation;
     private DriveConnectionStatus? previousDriveStatus;
     private string? sourcePath;
@@ -58,6 +60,12 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private bool syncOnDriveConnected;
     private bool allowAutomaticMirror;
     private int driveConnectedDelaySeconds = 10;
+    private bool syncPeriodicallyWhileConnected;
+    private int periodicSyncIntervalMinutes = 60;
+    private DateTimeOffset? nextPeriodicSyncUtc;
+    private bool runAtWindowsStartup;
+    private bool keepRunningInBackground = true;
+    private bool startMinimizedToTray = true;
 
     public MainViewModel(
         IConfigurationStore configurationStore,
@@ -69,7 +77,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         IThemeService themeService,
         IUpdateChecker updateChecker,
         IUpdateDownloader updateDownloader,
-        IUpdateInstaller updateInstaller)
+        IUpdateInstaller updateInstaller,
+        IStartupRegistrationService startupRegistrationService)
     {
         this.configurationStore = configurationStore;
         this.driveDetectionService = driveDetectionService;
@@ -81,6 +90,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         this.updateChecker = updateChecker;
         this.updateDownloader = updateDownloader;
         this.updateInstaller = updateInstaller;
+        this.startupRegistrationService = startupRegistrationService;
 
         ShowDashboardCommand = new(() => IsSettingsPageVisible = false);
         ShowSettingsCommand = new(() => IsSettingsPageVisible = true);
@@ -182,6 +192,38 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     {
         get => driveConnectedDelaySeconds;
         set => SetProperty(ref driveConnectedDelaySeconds, value);
+    }
+
+    public bool SyncPeriodicallyWhileConnected
+    {
+        get => syncPeriodicallyWhileConnected;
+        set => SetProperty(ref syncPeriodicallyWhileConnected, value);
+    }
+
+    public IReadOnlyList<int> AvailablePeriodicSyncIntervals { get; } = [15, 30, 60, 120, 240, 480, 720, 1440];
+
+    public int PeriodicSyncIntervalMinutes
+    {
+        get => periodicSyncIntervalMinutes;
+        set => SetProperty(ref periodicSyncIntervalMinutes, value);
+    }
+
+    public bool RunAtWindowsStartup
+    {
+        get => runAtWindowsStartup;
+        set => SetProperty(ref runAtWindowsStartup, value);
+    }
+
+    public bool KeepRunningInBackground
+    {
+        get => keepRunningInBackground;
+        set => SetProperty(ref keepRunningInBackground, value);
+    }
+
+    public bool StartMinimizedToTray
+    {
+        get => startMinimizedToTray;
+        set => SetProperty(ref startMinimizedToTray, value);
     }
 
     public bool UseSystemTheme
@@ -335,6 +377,10 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         var loadResult = await configurationStore.LoadAsync();
         savedSettings = loadResult.Settings;
         ApplySettings(savedSettings);
+        if (savedSettings.RunAtWindowsStartup)
+        {
+            startupRegistrationService.TrySetEnabled(enabled: true, out _);
+        }
         RefreshAvailability();
 
         if (!string.IsNullOrWhiteSpace(loadResult.UserMessage))
@@ -373,10 +419,17 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         if (drive.Status != DriveConnectionStatus.Connected)
         {
             CancelPendingAutoSync();
+            nextPeriodicSyncUtc = null;
+            CancelSynchronizationForDisconnectedSource();
         }
-        else if (!isFirstObservation && !wasConnected && savedSettings.SyncOnDriveConnected)
+        else
         {
-            _ = ScheduleAutoSyncAsync();
+            if (!isFirstObservation && !wasConnected && savedSettings.SyncOnDriveConnected)
+            {
+                _ = ScheduleAutoSyncAsync();
+            }
+
+            EvaluatePeriodicSync();
         }
         NotifyCommandStates();
     }
@@ -472,17 +525,24 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (Mode == SyncMode.Mirror && SyncOnDriveConnected && AllowAutomaticMirror
+        if (Mode == SyncMode.Mirror
+            && (SyncOnDriveConnected || SyncPeriodicallyWhileConnected)
+            && AllowAutomaticMirror
             && !savedSettings.AllowAutomaticMirror
             && !userDialog.Confirm(
                 "Consentire Mirror automatico?",
-                "Mirror automatico può eliminare dalla destinazione senza conferma a ogni collegamento. L'anteprima tecnica verrà comunque eseguita. Vuoi abilitarlo?"))
+                "Mirror automatico può eliminare dalla destinazione senza conferma durante le sincronizzazioni automatiche. L'anteprima tecnica verrà comunque eseguita. Vuoi abilitarlo?"))
         {
             AllowAutomaticMirror = false;
             return;
         }
 
         var updated = BuildEditedSettings() with { SourceDrive = capture.Fingerprint };
+        if (!startupRegistrationService.TrySetEnabled(updated.RunAtWindowsStartup, out var startupError))
+        {
+            userDialog.ShowError("Avvio automatico", startupError!);
+            return;
+        }
         await configurationStore.SaveAsync(updated);
         savedSettings = updated;
         ApplySettings(updated);
@@ -499,6 +559,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         IsBusy = true;
         LogLines.Clear();
         synchronizationCancellation = new();
+        synchronizationCancellationReason = SynchronizationCancellationReason.None;
 
         try
         {
@@ -527,6 +588,11 @@ public sealed class MainViewModel : ObservableObject, IDisposable
                     savedSettings,
                     progress: null,
                     synchronizationCancellation.Token);
+                preview = DescribeCancellationReason(preview);
+                if (preview.Status == SynchronizationStatus.SourceDisconnected)
+                {
+                    await logger.WriteAsync(LogLevel.Warning, preview.UserMessage);
+                }
                 ApplySynchronizationResult(preview, persistHistory: false);
                 AppendFriendlySummary(preview, isPreview: true);
                 if (preview.Status is not SynchronizationStatus.Completed
@@ -553,6 +619,11 @@ public sealed class MainViewModel : ObservableObject, IDisposable
                 mirrorConfirmed: savedSettings.Mode == SyncMode.Mirror,
                 progress: null,
                 synchronizationCancellation.Token);
+            result = DescribeCancellationReason(result);
+            if (result.Status == SynchronizationStatus.SourceDisconnected)
+            {
+                await logger.WriteAsync(LogLevel.Warning, result.UserMessage);
+            }
             ApplySynchronizationResult(result, persistHistory: true);
             AppendFriendlySummary(result, isPreview: false);
             await PersistHistoryAsync(result);
@@ -561,15 +632,49 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         {
             synchronizationCancellation.Dispose();
             synchronizationCancellation = null;
+            synchronizationCancellationReason = SynchronizationCancellationReason.None;
             IsBusy = false;
+            ResetPeriodicScheduleFromNow();
             RefreshAvailability();
         }
     }
 
     private void CancelSynchronization()
     {
+        if (synchronizationCancellation is not null
+            && !synchronizationCancellation.IsCancellationRequested)
+        {
+            synchronizationCancellationReason = SynchronizationCancellationReason.User;
+        }
         synchronizationCancellation?.Cancel();
         CancelPendingAutoSync();
+    }
+
+    private void CancelSynchronizationForDisconnectedSource()
+    {
+        if (synchronizationCancellation is null || synchronizationCancellation.IsCancellationRequested)
+        {
+            return;
+        }
+
+        synchronizationCancellationReason = SynchronizationCancellationReason.SourceDisconnected;
+        OperationStatus = "Interruzione: SSD scollegato";
+        synchronizationCancellation.Cancel();
+    }
+
+    private SynchronizationResult DescribeCancellationReason(SynchronizationResult result)
+    {
+        if (result.Status != SynchronizationStatus.Cancelled
+            || synchronizationCancellationReason != SynchronizationCancellationReason.SourceDisconnected)
+        {
+            return result;
+        }
+
+        return result with
+        {
+            Status = SynchronizationStatus.SourceDisconnected,
+            UserMessage = "Sincronizzazione interrotta perché l’SSD è stato scollegato. I file già elaborati non sono stati ripristinati.",
+        };
     }
 
     private async Task ScheduleAutoSyncAsync()
@@ -615,6 +720,55 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     private void CancelPendingAutoSync() => autoSyncDelayCancellation?.Cancel();
 
+    private void EvaluatePeriodicSync()
+    {
+        if (!savedSettings.SyncPeriodicallyWhileConnected)
+        {
+            nextPeriodicSyncUtc = null;
+            return;
+        }
+
+        var now = DateTimeOffset.UtcNow;
+        if (nextPeriodicSyncUtc is null)
+        {
+            ResetPeriodicScheduleFromNow();
+            return;
+        }
+
+        if (now < nextPeriodicSyncUtc || IsBusy || autoSyncDelayCancellation is not null)
+        {
+            return;
+        }
+
+        nextPeriodicSyncUtc = now.AddMinutes(savedSettings.PeriodicSyncIntervalMinutes);
+        _ = RunPeriodicSyncAsync();
+    }
+
+    private async Task RunPeriodicSyncAsync()
+    {
+        if (savedSettings.Mode == SyncMode.Mirror && !savedSettings.AllowAutomaticMirror)
+        {
+            OperationStatus = "Sincronizzazione periodica bloccata: Mirror automatico non autorizzato";
+            return;
+        }
+
+        try
+        {
+            await SynchronizeCoreAsync(automatic: true);
+        }
+        catch (Exception exception)
+        {
+            HandleUnexpectedError(exception);
+        }
+    }
+
+    private void ResetPeriodicScheduleFromNow()
+    {
+        nextPeriodicSyncUtc = savedSettings.SyncPeriodicallyWhileConnected
+            ? DateTimeOffset.UtcNow.AddMinutes(savedSettings.PeriodicSyncIntervalMinutes)
+            : null;
+    }
+
     private bool CanSynchronize() =>
         !IsBusy
         && IsSsdAvailable
@@ -631,6 +785,12 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         SyncOnDriveConnected = settings.SyncOnDriveConnected;
         AllowAutomaticMirror = settings.AllowAutomaticMirror;
         DriveConnectedDelaySeconds = settings.DriveConnectedDelaySeconds;
+        SyncPeriodicallyWhileConnected = settings.SyncPeriodicallyWhileConnected;
+        PeriodicSyncIntervalMinutes = settings.PeriodicSyncIntervalMinutes;
+        RunAtWindowsStartup = settings.RunAtWindowsStartup;
+        KeepRunningInBackground = settings.KeepRunningInBackground;
+        StartMinimizedToTray = settings.StartMinimizedToTray;
+        nextPeriodicSyncUtc = null;
         SourcePath = settings.SourcePath;
         DestinationPath = settings.DestinationPath;
         Mode = settings.Mode;
@@ -655,6 +815,11 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         SyncOnDriveConnected = SyncOnDriveConnected,
         AllowAutomaticMirror = AllowAutomaticMirror,
         DriveConnectedDelaySeconds = DriveConnectedDelaySeconds,
+        SyncPeriodicallyWhileConnected = SyncPeriodicallyWhileConnected,
+        PeriodicSyncIntervalMinutes = PeriodicSyncIntervalMinutes,
+        RunAtWindowsStartup = RunAtWindowsStartup,
+        KeepRunningInBackground = KeepRunningInBackground,
+        StartMinimizedToTray = StartMinimizedToTray,
         Exclusions = ExclusionsText
             .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -685,6 +850,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             SynchronizationStatus.Completed => "Completato",
             SynchronizationStatus.CompletedWithWarnings => "Completato con avvisi",
             SynchronizationStatus.Cancelled => "Annullato",
+            SynchronizationStatus.SourceDisconnected => "Interrotta: SSD scollegato",
             SynchronizationStatus.SsdNotConnected => "SSD non collegato",
             SynchronizationStatus.DestinationUnavailable => "Destinazione non disponibile",
             _ => "Errore",
@@ -864,4 +1030,11 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private static string GetRawApplicationVersion() => Assembly.GetEntryAssembly()?
         .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
         .InformationalVersion.Split('+', 2)[0] ?? "0.0.0";
+
+    private enum SynchronizationCancellationReason
+    {
+        None,
+        User,
+        SourceDisconnected,
+    }
 }

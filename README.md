@@ -57,12 +57,27 @@ La pagina Impostazioni confronta direttamente Backup e Mirror e chiarisce quali
 file restano o vengono eliminati dalla destinazione prima della selezione.
 Può inoltre avviare automaticamente Backup quando rileva il collegamento
 dell'SSD, dopo un ritardo configurabile tra 5 secondi e 10 minuti. Il countdown
-viene annullato se il supporto scompare. Mirror può essere autorizzato
-separatamente: esegue comunque l'anteprima tecnica, ma dopo il consenso iniziale
-può eliminare automaticamente dalla destinazione senza ulteriori conferme.
+viene annullato se il supporto scompare. Finché DriveHarbor resta aperto e la
+sorgente è disponibile, può anche ripetere la sincronizzazione ogni 15 minuti,
+30 minuti oppure da 1 a 24 ore. Le esecuzioni non si sovrappongono e l'intervallo
+riparte al termine di ogni sincronizzazione. Mirror può essere autorizzato
+separatamente per entrambe le automazioni: esegue comunque l'anteprima tecnica,
+ma dopo il consenso iniziale può eliminare automaticamente dalla destinazione
+senza ulteriori conferme.
+Se la sorgente viene scollegata durante una sincronizzazione, DriveHarbor rileva
+la perdita del volume, arresta Robocopy e registra un risultato distinto
+"Interrotta: SSD scollegato". I file già elaborati non vengono ripristinati; una
+sincronizzazione successiva completa o riprende quanto rimasto incompleto.
 L'aspetto può essere impostato su Sistema, Chiaro o Scuro. La modalità Sistema,
 predefinita, segue il tema delle app configurato in Windows anche mentre
 DriveHarbor è aperto.
+
+DriveHarbor può essere registrato per l'avvio automatico all'accesso dell'utente
+Windows, senza privilegi amministrativi. Se il funzionamento in background è
+attivo, la chiusura della finestra mantiene l'app nell'area di notifica: il menu
+con il logo permette di riaprire la dashboard, avviare una sincronizzazione o
+uscire completamente. L'avvio da Windows può mostrare direttamente la sola
+icona nell'area di notifica.
 
 ## Configurazione locale
 

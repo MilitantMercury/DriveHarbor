@@ -15,6 +15,10 @@
         <SolidColorBrush x:Key="FieldTextBrush" Color="#354A61" />
         <SolidColorBrush x:Key="BorderBrush" Color="#DDE5ED" />
         <SolidColorBrush x:Key="InputBorderBrush" Color="#C8D4E0" />
+        <SolidColorBrush x:Key="ControlHoverBrush" Color="#E5F1FC" />
+        <SolidColorBrush x:Key="ControlSelectedBrush" Color="#D6EAFB" />
+        <SolidColorBrush x:Key="DangerButtonBrush" Color="#C93434" />
+        <SolidColorBrush x:Key="DangerButtonHoverBrush" Color="#A92525" />
         <SolidColorBrush x:Key="SecondaryButtonTextBrush" Color="#24384F" />
         <SolidColorBrush x:Key="BackupPanelBrush" Color="#EAF7EF" />
         <SolidColorBrush x:Key="BackupTextBrush" Color="#17633A" />

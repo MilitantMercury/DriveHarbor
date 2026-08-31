@@ -8,7 +8,7 @@
 | Cambio della lettera dell'unità | Alta | GUID/seriale del volume e ricostruzione controllata del percorso relativo |
 | Seriale duplicato o identità volume parziale | Alta | Label solo come disambiguazione; corrispondenze multiple bloccate come ambigue |
 | SSD USB riportato da Windows come disco fisso | Media | Nessun rifiuto basato solo su `DriveType`; identità stabile obbligatoria |
-| SSD scollegato durante la copia | Alta | Monitoraggio processo, annullamento e risultato di errore senza ulteriori cancellazioni |
+| SSD scollegato durante la copia | Alta | Rilevamento periodico, arresto del processo Robocopy e risultato dedicato; nessun rollback dei file già elaborati |
 | Destinazione OneDrive indisponibile | Alta | Verifica immediatamente prima dell'avvio; nessuna creazione implicita rischiosa |
 | Interpretazione errata degli exit code Robocopy | Alta | Modello esplicito e test per i codici 0-16 |
 | Comando Robocopy costruito con argomenti non sicuri | Alta | `ArgumentList`, esclusioni validate e test dei flag per ogni modalità |

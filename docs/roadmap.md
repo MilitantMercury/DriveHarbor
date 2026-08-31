@@ -33,7 +33,8 @@ di draft release. La pubblicazione resta subordinata alla checklist manuale.
 
 ## Dopo la V1
 
-- Avvio automatico al collegamento dell'SSD.
-- Pianificazione e avvio con Windows.
-- System tray e notifiche locali.
+- Avvio automatico al collegamento dell'SSD e sincronizzazione periodica mentre
+  la sorgente resta disponibile — completati.
+- Avvio con Windows per l'utente corrente — completato.
+- System tray, funzionamento in background e notifica locale — completati.
 - Supporto Windows ARM64.
