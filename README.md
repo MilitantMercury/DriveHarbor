@@ -232,9 +232,13 @@ scelta dell'utente.
 
 Il download avviene in `%LocalAppData%\DriveHarbor\Updates`, accetta pacchetti
 fino a 250 MB e completa il salvataggio soltanto quando il digest SHA-256
-corrisponde a quello pubblicato. Dopo una seconda conferma, un updater separato
-chiude DriveHarbor, conserva i file che sostituirà, applica il pacchetto e
-riavvia l'app. In caso di errore durante la copia ripristina i file precedenti.
+corrisponde a quello pubblicato. La dashboard mostra percentuale e avanzamento
+durante il download. Dopo una seconda conferma, un updater separato richiede
+l'autorizzazione UAC quando la cartella di installazione è protetta, chiude
+DriveHarbor, conserva i file che sostituirà, applica il pacchetto e riavvia
+l'app. In caso di errore durante la copia ripristina i file precedenti, riapre
+DriveHarbor e mostra l'esito registrato localmente. Consulta anche la
+[politica di sicurezza](SECURITY.md).
 
 ## Avvertenze
 

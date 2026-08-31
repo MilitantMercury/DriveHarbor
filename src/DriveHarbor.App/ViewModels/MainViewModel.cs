@@ -41,6 +41,9 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private Uri? updateUri;
     private UpdateCheckResult? lastAvailableUpdate;
     private string updateMessage = string.Empty;
+    private double updateDownloadPercentage;
+    private string updateDownloadStatus = string.Empty;
+    private bool isDownloadingUpdate;
     private string exclusionsText = string.Empty;
     private string logDirectory = AppPaths.DefaultLogDirectory;
     private string ssdStatus = "Non configurato";
@@ -138,6 +141,21 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     }
 
     public Visibility UpdateVisibility => updateUri is null ? Visibility.Collapsed : Visibility.Visible;
+
+    public double UpdateDownloadPercentage
+    {
+        get => updateDownloadPercentage;
+        private set => SetProperty(ref updateDownloadPercentage, value);
+    }
+
+    public string UpdateDownloadStatus
+    {
+        get => updateDownloadStatus;
+        private set => SetProperty(ref updateDownloadStatus, value);
+    }
+
+    public Visibility UpdateDownloadProgressVisibility =>
+        isDownloadingUpdate ? Visibility.Visible : Visibility.Collapsed;
 
     public bool SyncOnDriveConnected
     {
@@ -765,24 +783,52 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     private async Task DownloadUpdateAsync()
     {
-        var result = await updateDownloader.DownloadAsync(lastAvailableUpdate!);
-        if (result.Succeeded)
+        isDownloadingUpdate = true;
+        OnPropertyChanged(nameof(UpdateDownloadProgressVisibility));
+        UpdateDownloadPercentage = 0;
+        UpdateDownloadStatus = "Preparazione download…";
+        IsBusy = true;
+        try
         {
-            if (userDialog.Confirm("Installare l'aggiornamento?", $"{result.UserMessage}\n\nDriveHarbor verrà chiuso, aggiornato e riaperto. Continuare?"))
+            var progress = new Progress<UpdateDownloadProgress>(value =>
             {
-                if (updateInstaller.TryStart(result.PackagePath!, out var errorMessage))
+                if (value.Percentage is { } percentage)
                 {
-                    Application.Current.Shutdown();
+                    UpdateDownloadPercentage = percentage;
+                    UpdateDownloadStatus = $"Download: {percentage:N0}%";
                 }
                 else
                 {
-                    userDialog.ShowError("Aggiornamento", errorMessage!);
+                    UpdateDownloadStatus = $"Scaricati {value.BytesReceived / 1024d / 1024d:N1} MB";
+                }
+            });
+            var result = await updateDownloader.DownloadAsync(lastAvailableUpdate!, progress);
+            if (result.Succeeded)
+            {
+                UpdateDownloadPercentage = 100;
+                UpdateDownloadStatus = "Download completato e verificato";
+                if (userDialog.Confirm("Installare l'aggiornamento?", $"{result.UserMessage}\n\nDriveHarbor verrà chiuso, aggiornato e riaperto. Potrebbe essere richiesta l'autorizzazione amministratore. Continuare?"))
+                {
+                    if (updateInstaller.TryStart(result.PackagePath!, out var errorMessage))
+                    {
+                        Application.Current.Shutdown();
+                    }
+                    else
+                    {
+                        userDialog.ShowError("Aggiornamento", errorMessage!);
+                    }
                 }
             }
+            else
+            {
+                userDialog.ShowError("Aggiornamento rifiutato", result.UserMessage);
+            }
         }
-        else
+        finally
         {
-            userDialog.ShowError("Aggiornamento rifiutato", result.UserMessage);
+            IsBusy = false;
+            isDownloadingUpdate = false;
+            OnPropertyChanged(nameof(UpdateDownloadProgressVisibility));
         }
     }
 

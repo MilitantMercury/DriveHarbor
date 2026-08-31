@@ -11,6 +11,7 @@ internal static class Updater
         var packagePath = Path.GetFullPath(args[0]);
         var installDirectory = Path.GetFullPath(args[1]);
         var appPath = Path.GetFullPath(args[3]);
+        var resultPath = Path.Combine(Path.GetDirectoryName(packagePath)!, "last-update-result.txt");
         if (!File.Exists(packagePath) || !Directory.Exists(installDirectory)
             || !IsInside(appPath, installDirectory) || !File.Exists(appPath)) return 3;
 
@@ -48,24 +49,59 @@ internal static class Updater
                 Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
                 File.Copy(source, destination, true);
             }
-            Process.Start(new ProcessStartInfo(appPath) { UseShellExecute = true });
+            WriteResult(resultPath, true, "DriveHarbor è stato aggiornato correttamente.");
+            StartApplication(appPath);
             return 0;
         }
-        catch
+        catch (Exception exception)
         {
-            foreach (var createdFile in createdFiles.Where(File.Exists)) File.Delete(createdFile);
-            foreach (var source in Directory.EnumerateFiles(backup, "*", SearchOption.AllDirectories))
+            var rollbackSucceeded = true;
+            try
             {
-                var destination = Path.Combine(installDirectory, Path.GetRelativePath(backup, source));
-                Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
-                File.Copy(source, destination, true);
+                foreach (var createdFile in createdFiles.Where(File.Exists)) File.Delete(createdFile);
+                foreach (var source in Directory.EnumerateFiles(backup, "*", SearchOption.AllDirectories))
+                {
+                    var destination = Path.Combine(installDirectory, Path.GetRelativePath(backup, source));
+                    Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+                    File.Copy(source, destination, true);
+                }
             }
+            catch (Exception) { rollbackSucceeded = false; }
+
+            var message = rollbackSucceeded
+                ? $"Aggiornamento non riuscito; la versione precedente è stata ripristinata. Dettaglio: {exception.Message}"
+                : $"Aggiornamento e ripristino non completati. Reinstalla DriveHarbor manualmente. Dettaglio: {exception.Message}";
+            WriteResult(resultPath, false, message);
+            StartApplication(appPath);
             return 5;
         }
         finally
         {
             try { Directory.Delete(workRoot, true); } catch (IOException) { }
         }
+    }
+
+    private static void StartApplication(string appPath)
+    {
+        try
+        {
+            var startInfo = new ProcessStartInfo("explorer.exe") { UseShellExecute = true };
+            startInfo.ArgumentList.Add(appPath);
+            Process.Start(startInfo);
+        }
+        catch (Exception) { }
+    }
+
+    private static void WriteResult(string resultPath, bool succeeded, string message)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(resultPath)!);
+            var temporaryPath = $"{resultPath}.{Guid.NewGuid():N}.tmp";
+            File.WriteAllLines(temporaryPath, [succeeded ? "SUCCESS" : "FAILURE", message]);
+            File.Move(temporaryPath, resultPath, true);
+        }
+        catch (Exception) { }
     }
 
     private static void ExtractSafely(string packagePath, string staging)

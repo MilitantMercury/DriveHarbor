@@ -13,4 +13,6 @@ public static class AppPaths
     public static string DefaultLogDirectory => Path.Combine(LocalDataDirectory, "Logs");
 
     public static string UpdatesDirectory => Path.Combine(LocalDataDirectory, "Updates");
+
+    public static string UpdateResultFile => Path.Combine(UpdatesDirectory, "last-update-result.txt");
 }

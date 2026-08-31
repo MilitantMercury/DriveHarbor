@@ -5,6 +5,15 @@ Il progetto segue il versionamento semantico.
 
 ## [Unreleased]
 
+### Fixed
+
+- L'updater richiede UAC per installazioni in cartelle protette, riapre l'app dopo errori o rollback e mostra l'esito dell'operazione.
+
+### Added
+
+- Barra di avanzamento e percentuale durante il download degli aggiornamenti.
+- Politica di sicurezza aggiornata con versioni supportate, segnalazioni private e modello di fiducia degli aggiornamenti.
+
 ## [1.0.1] - 2026-08-31
 
 ### Changed
