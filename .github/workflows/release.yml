@@ -64,4 +64,18 @@ jobs:
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create $env:GITHUB_REF_NAME artifacts/DriveHarbor-$env:GITHUB_REF_NAME-win-x64.zip artifacts/DriveHarbor-$env:GITHUB_REF_NAME-win-x64.zip.sha256 artifacts/DriveHarbor-$env:GITHUB_REF_NAME-win-x64.zip.sigstore.json --draft --prerelease --generate-notes --title "DriveHarbor $env:GITHUB_REF_NAME"
+        run: |
+          $assets = @(
+            "artifacts/DriveHarbor-$env:GITHUB_REF_NAME-win-x64.zip"
+            "artifacts/DriveHarbor-$env:GITHUB_REF_NAME-win-x64.zip.sha256"
+            "artifacts/DriveHarbor-$env:GITHUB_REF_NAME-win-x64.zip.sigstore.json"
+          )
+          $releaseArguments = @(
+            "release", "create", $env:GITHUB_REF_NAME
+            $assets
+            "--draft", "--generate-notes", "--title", "DriveHarbor $env:GITHUB_REF_NAME"
+          )
+          if ($env:GITHUB_REF_NAME.Contains("-")) {
+            $releaseArguments += "--prerelease"
+          }
+          & gh @releaseArguments
