@@ -25,7 +25,7 @@ richiede account aggiuntivi, non include telemetria e non invia dati all'esterno
 
 ## Stato del progetto
 
-La versione corrente è `1.0.4`. Sono disponibili la foundation tecnica, il
+La versione corrente è `1.1.0`. Sono disponibili la foundation tecnica, il
 modello di configurazione locale e le regole di sicurezza dei percorsi. Le
 funzioni di rilevamento stabile del volume sorgente sono incluse; la copia vera
 e propria è collegata alla dashboard WPF tramite preflight conservativo. Le

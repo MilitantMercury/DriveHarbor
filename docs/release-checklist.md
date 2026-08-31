@@ -31,6 +31,7 @@ stati verificati manualmente.
 - [ ] Draft release revisionata manualmente prima della pubblicazione.
 
 Il workflow associato ai tag `v*` crea deliberatamente una release in stato
-**draft pre-release**. Lo ZIP, il file `.sha256` e il bundle
+**draft release**; soltanto i tag con suffisso beta vengono marcati come
+pre-release. Lo ZIP, il file `.sha256` e il bundle
 `.sigstore.json` vengono allegati insieme; la pubblicazione resta sempre
 un'azione manuale.
