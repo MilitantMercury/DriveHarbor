@@ -189,10 +189,10 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Border Padding="18,14" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
-                            <TextBlock Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" Text="Log sincronizzazione" />
+                            <TextBlock Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" Text="Attività sincronizzazione" />
                         </Border>
                         <ListBox Grid.Row="1" ItemsSource="{Binding LogLines}" BorderThickness="0" Background="{DynamicResource LogBackgroundBrush}" Foreground="{DynamicResource PrimaryTextBrush}"
-                                 Padding="12" FontFamily="Consolas" FontSize="12" ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+                                 Padding="18,12" FontFamily="Segoe UI" FontSize="13" ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
                     </Grid>
                 </Border>
             </Grid>

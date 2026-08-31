@@ -437,7 +437,6 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         IsBusy = true;
         LogLines.Clear();
         synchronizationCancellation = new();
-        var progress = new Progress<string>(AppendLogLine);
 
         try
         {
@@ -461,11 +460,13 @@ public sealed class MainViewModel : ObservableObject, IDisposable
                 }
 
                 OperationStatus = "Analisi Mirror in corso";
+                AppendLogLine("Anteprima Mirror in corso…");
                 var preview = await service.PreviewMirrorAsync(
                     savedSettings,
-                    progress,
+                    progress: null,
                     synchronizationCancellation.Token);
                 ApplySynchronizationResult(preview, persistHistory: false);
+                AppendFriendlySummary(preview, isPreview: true);
                 if (preview.Status is not SynchronizationStatus.Completed
                     and not SynchronizationStatus.CompletedWithWarnings)
                 {
@@ -482,12 +483,16 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             }
 
             OperationStatus = "Sincronizzazione in corso";
+            AppendLogLine(savedSettings.Mode == SyncMode.Mirror
+                ? "Sincronizzazione Mirror in corso…"
+                : "Backup in corso…");
             var result = await service.SynchronizeAsync(
                 savedSettings,
                 mirrorConfirmed: savedSettings.Mode == SyncMode.Mirror,
-                progress,
+                progress: null,
                 synchronizationCancellation.Token);
             ApplySynchronizationResult(result, persistHistory: true);
+            AppendFriendlySummary(result, isPreview: false);
             await PersistHistoryAsync(result);
         }
         finally
@@ -635,6 +640,39 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         }
 
         LogLines.Add(line);
+    }
+
+    private void AppendFriendlySummary(SynchronizationResult result, bool isPreview)
+    {
+        AppendLogLine(string.Empty);
+        AppendLogLine(isPreview ? "RIEPILOGO ANTEPRIMA" : "RIEPILOGO FINALE");
+        AppendLogLine(result.UserMessage);
+
+        if (result.Summary is not { } summary || summary.TotalFiles is null)
+        {
+            AppendLogLine("I conteggi dei file non sono disponibili.");
+            return;
+        }
+
+        AppendLogLine($"File esaminati: {summary.TotalFiles.Value:N0}");
+        AppendLogLine($"File {(isPreview ? "da aggiungere o aggiornare" : "aggiunti o aggiornati")}: {summary.CopiedFiles ?? 0:N0}");
+        AppendLogLine($"File già sincronizzati: {summary.SkippedFiles ?? 0:N0}");
+
+        if (savedSettings.Mode == SyncMode.Mirror)
+        {
+            AppendLogLine($"File {(isPreview ? "da eliminare" : "eliminati")}: {summary.ExtraFiles ?? 0:N0}");
+        }
+        else if (summary.ExtraFiles > 0)
+        {
+            AppendLogLine($"File presenti solo nella destinazione (mantenuti): {summary.ExtraFiles.Value:N0}");
+        }
+
+        if (summary.MismatchedFiles > 0)
+        {
+            AppendLogLine($"File non corrispondenti: {summary.MismatchedFiles.Value:N0}");
+        }
+
+        AppendLogLine($"Errori sui file: {summary.FailedFiles ?? 0:N0}");
     }
 
     private void CancelSettingsChanges()
