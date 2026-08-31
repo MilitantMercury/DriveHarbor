@@ -1,10 +1,13 @@
 using System.Diagnostics;
+using System.Globalization;
+using System.Text;
 
 namespace DriveHarbor.Core.Robocopy;
 
 public sealed class RobocopyRunner : IRobocopyRunner
 {
     private const int MaximumCapturedLines = 2_000;
+    private static readonly Encoding RobocopyOutputEncoding = CreateRobocopyOutputEncoding();
 
     public async Task<RobocopyResult> RunAsync(
         RobocopyRequest request,
@@ -75,6 +78,7 @@ public sealed class RobocopyRunner : IRobocopyRunner
             CreateNoWindow = true,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            StandardOutputEncoding = RobocopyOutputEncoding,
         };
 
         foreach (var argument in arguments)
@@ -83,6 +87,12 @@ public sealed class RobocopyRunner : IRobocopyRunner
         }
 
         return new Process { StartInfo = startInfo };
+    }
+
+    private static Encoding CreateRobocopyOutputEncoding()
+    {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        return Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
     }
 
     private static async Task ReadLinesAsync(

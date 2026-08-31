@@ -35,7 +35,9 @@ Consulta la [roadmap](docs/roadmap.md) per la sequenza prevista.
 ## Interfaccia
 
 La dashboard mostra stato SSD e OneDrive, modalità, ultima sincronizzazione,
-ultimo risultato e log in tempo reale. La pagina Impostazioni permette di
+ultimo risultato e un riepilogo leggibile dell'attività. Al termine indica file
+esaminati, aggiunti o aggiornati, già sincronizzati, eliminati ed eventuali
+errori; il log tecnico completo resta disponibile nei file locali. La pagina Impostazioni permette di
 selezionare sorgente, destinazione, modalità, esclusioni e posizione dei log.
 
 La UI resta reattiva mentre Robocopy lavora e offre l'annullamento. Lo stato dei
