@@ -143,6 +143,7 @@ public sealed class JsonConfigurationStore : IConfigurationStore
         && Enum.IsDefined(settings.Theme)
         && Enum.IsDefined(settings.UpdateChannel)
         && settings.DriveConnectedDelaySeconds is >= 5 and <= 600
+        && settings.PeriodicSyncIntervalMinutes is >= 15 and <= 1440
         && settings.Exclusions is not null
         && settings.Exclusions.All(exclusion => !string.IsNullOrWhiteSpace(exclusion))
         && !string.IsNullOrWhiteSpace(settings.LogDirectory);

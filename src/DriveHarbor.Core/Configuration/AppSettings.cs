@@ -26,6 +26,16 @@ public sealed record AppSettings
 
     public int DriveConnectedDelaySeconds { get; init; } = 10;
 
+    public bool SyncPeriodicallyWhileConnected { get; init; }
+
+    public int PeriodicSyncIntervalMinutes { get; init; } = 60;
+
+    public bool RunAtWindowsStartup { get; init; }
+
+    public bool KeepRunningInBackground { get; init; } = true;
+
+    public bool StartMinimizedToTray { get; init; } = true;
+
     public DriveFingerprint? SourceDrive { get; init; }
 
     public IReadOnlyList<string> Exclusions { get; init; } = Array.AsReadOnly<string>(

@@ -5,6 +5,22 @@ Il progetto segue il versionamento semantico.
 
 ## [Unreleased]
 
+### Added
+
+- Sincronizzazione periodica configurabile mentre l'SSD resta collegato, senza esecuzioni sovrapposte.
+- Avvio facoltativo all'accesso di Windows e funzionamento nell'area di notifica con menu rapido.
+- Logo DriveHarbor nella barra laterale e nel menu dell'area di notifica.
+
+### Changed
+
+- Controlli, menu a tendina, barra del titolo e pulsante Annulla hanno colori coerenti e leggibili nel tema scuro.
+- DriveHarbor può restare attivo in background quando la finestra viene chiusa.
+
+### Fixed
+
+- I pannelli SSD e OneDrive usano correttamente il colore verde quando le risorse sono disponibili.
+- Lo scollegamento dell'SSD durante una sincronizzazione arresta Robocopy e produce un risultato dedicato.
+
 ## [1.0.4] - 2026-08-31
 
 ### Fixed

@@ -36,6 +36,11 @@ public sealed class JsonConfigurationStoreTests
             SyncOnDriveConnected = true,
             AllowAutomaticMirror = true,
             DriveConnectedDelaySeconds = 30,
+            SyncPeriodicallyWhileConnected = true,
+            PeriodicSyncIntervalMinutes = 120,
+            RunAtWindowsStartup = true,
+            KeepRunningInBackground = true,
+            StartMinimizedToTray = true,
             SourceDrive = new DriveFingerprint
             {
                 VolumeGuidPath = @"\\?\Volume{11111111-1111-1111-1111-111111111111}\",
@@ -57,6 +62,11 @@ public sealed class JsonConfigurationStoreTests
         Assert.Equal(expected.SyncOnDriveConnected, result.Settings.SyncOnDriveConnected);
         Assert.Equal(expected.AllowAutomaticMirror, result.Settings.AllowAutomaticMirror);
         Assert.Equal(expected.DriveConnectedDelaySeconds, result.Settings.DriveConnectedDelaySeconds);
+        Assert.Equal(expected.SyncPeriodicallyWhileConnected, result.Settings.SyncPeriodicallyWhileConnected);
+        Assert.Equal(expected.PeriodicSyncIntervalMinutes, result.Settings.PeriodicSyncIntervalMinutes);
+        Assert.Equal(expected.RunAtWindowsStartup, result.Settings.RunAtWindowsStartup);
+        Assert.Equal(expected.KeepRunningInBackground, result.Settings.KeepRunningInBackground);
+        Assert.Equal(expected.StartMinimizedToTray, result.Settings.StartMinimizedToTray);
         Assert.Equal(expected.SourceDrive, result.Settings.SourceDrive);
         Assert.Equal(expected.Exclusions, result.Settings.Exclusions);
         Assert.Empty(Directory.EnumerateFiles(temporaryDirectory.FullPath, "*.tmp"));

@@ -1,4 +1,6 @@
+using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
 using DriveHarbor.Core.Configuration;
 using Microsoft.Win32;
@@ -7,6 +9,8 @@ namespace DriveHarbor.App.Services;
 
 public sealed class ThemeService : IThemeService, IDisposable
 {
+    private const int DwmwaUseImmersiveDarkModeBefore20H1 = 19;
+    private const int DwmwaUseImmersiveDarkMode = 20;
     private AppTheme selectedTheme = AppTheme.System;
 
     public ThemeService()
@@ -20,6 +24,7 @@ public sealed class ThemeService : IThemeService, IDisposable
         var useDarkColors = theme == AppTheme.Dark
             || (theme == AppTheme.System && IsWindowsDarkTheme());
         ApplyPalette(useDarkColors);
+        ApplyWindowTitleBars(useDarkColors);
     }
 
     public void Dispose()
@@ -38,6 +43,46 @@ public sealed class ThemeService : IThemeService, IDisposable
         Application.Current.Resources[key] = new SolidColorBrush(
             (Color)ColorConverter.ConvertFromString(color));
 
+    private static void ApplyWindowTitleBars(bool dark)
+    {
+        var enabled = dark ? 1 : 0;
+        foreach (Window window in Application.Current.Windows)
+        {
+            var handle = new WindowInteropHelper(window).Handle;
+            if (handle == IntPtr.Zero)
+            {
+                continue;
+            }
+
+            var result = DwmSetWindowAttribute(
+                handle,
+                DwmwaUseImmersiveDarkMode,
+                ref enabled,
+                Marshal.SizeOf<int>());
+
+            if (result != 0)
+            {
+                var fallbackResult = DwmSetWindowAttribute(
+                    handle,
+                    DwmwaUseImmersiveDarkModeBefore20H1,
+                    ref enabled,
+                    Marshal.SizeOf<int>());
+
+                if (fallbackResult != 0)
+                {
+                    continue;
+                }
+            }
+        }
+    }
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(
+        IntPtr windowHandle,
+        int attribute,
+        ref int attributeValue,
+        int attributeSize);
+
     private static void ApplyPalette(bool dark)
     {
         SetBrush("WindowBackgroundBrush", dark ? "#101820" : "#F3F6FA");
@@ -52,6 +97,10 @@ public sealed class ThemeService : IThemeService, IDisposable
         SetBrush("FieldTextBrush", dark ? "#D7E2EC" : "#354A61");
         SetBrush("BorderBrush", dark ? "#344454" : "#DDE5ED");
         SetBrush("InputBorderBrush", dark ? "#4A5C6D" : "#C8D4E0");
+        SetBrush("ControlHoverBrush", dark ? "#263746" : "#E5F1FC");
+        SetBrush("ControlSelectedBrush", dark ? "#294C68" : "#D6EAFB");
+        SetBrush("DangerButtonBrush", dark ? "#B9383E" : "#C93434");
+        SetBrush("DangerButtonHoverBrush", dark ? "#D04A50" : "#A92525");
         SetBrush("SecondaryButtonTextBrush", dark ? "#DCE7F1" : "#24384F");
         SetBrush("BackupPanelBrush", dark ? "#173426" : "#EAF7EF");
         SetBrush("BackupTextBrush", dark ? "#8ED8AE" : "#17633A");

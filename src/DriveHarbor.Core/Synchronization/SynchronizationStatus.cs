@@ -5,6 +5,7 @@ public enum SynchronizationStatus
     Completed,
     CompletedWithWarnings,
     Cancelled,
+    SourceDisconnected,
     Error,
     SsdNotConnected,
     DestinationUnavailable,

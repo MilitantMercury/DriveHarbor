@@ -13,9 +13,27 @@
             <Setter Property="Margin" Value="8,2" />
             <Setter Property="FontSize" Value="15" />
             <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="NavBorder" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="NavBorder" Property="Background" Value="{DynamicResource SidebarHoverBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="NavBorder" Property="Background" Value="{DynamicResource SidebarHoverBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource SidebarHoverBrush}" />
                     <Setter Property="Foreground" Value="White" />
                 </Trigger>
             </Style.Triggers>
@@ -45,6 +63,33 @@
             <Setter Property="Padding" Value="16,9" />
             <Setter Property="Cursor" Value="Hand" />
         </Style>
+        <Style x:Key="DangerButton" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource DangerButtonBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="16,9" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="DangerBorder" Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}" CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="DangerBorder" Property="Background" Value="{DynamicResource DangerButtonHoverBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="DangerBorder" Property="Opacity" Value="0.45" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="Card" TargetType="Border">
             <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
@@ -56,10 +101,10 @@
             <Setter Property="Background" Value="{DynamicResource UnavailablePanelBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource UnavailableBorderBrush}" />
             <Style.Triggers>
-                <Trigger Property="Tag" Value="True">
+                <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True">
                     <Setter Property="Background" Value="{DynamicResource AvailablePanelBrush}" />
                     <Setter Property="BorderBrush" Value="{DynamicResource AvailableBorderBrush}" />
-                </Trigger>
+                </DataTrigger>
             </Style.Triggers>
         </Style>
         <Style x:Key="StatusValue" TargetType="TextBlock">
@@ -67,9 +112,9 @@
             <Setter Property="FontSize" Value="18" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Style.Triggers>
-                <Trigger Property="Tag" Value="True">
+                <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True">
                     <Setter Property="Foreground" Value="{DynamicResource AvailableTextBrush}" />
-                </Trigger>
+                </DataTrigger>
             </Style.Triggers>
         </Style>
         <Style x:Key="FieldLabel" TargetType="TextBlock">
@@ -88,6 +133,85 @@
             <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
             <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+                        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                        <Setter Property="Padding" Value="10,7" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ComboBoxItem">
+                                    <Border x:Name="ItemBorder" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsHighlighted" Value="True">
+                                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource ControlHoverBrush}" />
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource ControlSelectedBrush}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="DropDownToggle" Focusable="False" ClickMode="Press"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="ToggleBorder" Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}">
+                                            <Grid>
+                                                <ContentPresenter Margin="{Binding Padding, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                                  HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                                  Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                                  ContentTemplate="{Binding SelectionBoxItemTemplate, RelativeSource={RelativeSource AncestorType=ComboBox}}" />
+                                                <Path Margin="0,0,11,0" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                      Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                      Data="M 0 0 L 4 4 L 8 0 Z" />
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="ToggleBorder" Property="Background" Value="{DynamicResource ControlHoverBrush}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <Popup x:Name="PART_Popup" AllowsTransparency="True" Focusable="False"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" PopupAnimation="Fade">
+                                <Border MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                        MaxHeight="260" Background="{DynamicResource InputBackgroundBrush}"
+                                        BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="1">
+                                    <ScrollViewer CanContentScroll="True">
+                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.55" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
 
@@ -104,9 +228,13 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <StackPanel Margin="26,28,20,30">
-                    <TextBlock Foreground="White" FontSize="25" FontWeight="SemiBold" Text="DriveHarbor" />
-                    <TextBlock Margin="0,5,0,0" Foreground="#91A9C1" FontSize="12" Text="SSD → OneDrive" />
+                <StackPanel Margin="20,28,16,30" Orientation="Horizontal">
+                    <Image Width="42" Height="42" Margin="0,0,12,0" VerticalAlignment="Center"
+                           Source="Assets/DriveHarbor.ico" Stretch="Uniform" />
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Foreground="White" FontSize="25" FontWeight="SemiBold" Text="DriveHarbor" />
+                        <TextBlock Margin="0,5,0,0" Foreground="#91A9C1" FontSize="12" Text="SSD → OneDrive" />
+                    </StackPanel>
                 </StackPanel>
                 <StackPanel Grid.Row="1">
                     <Button Style="{StaticResource NavButton}" Command="{Binding ShowDashboardCommand}" Content="⌂  Dashboard" />
@@ -133,7 +261,7 @@
                         <TextBlock Margin="0,6,0,0" Foreground="{DynamicResource SecondaryTextBrush}" Text="Controlla lo stato e sincronizza in sicurezza." />
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                        <Button Margin="0,0,10,0" Style="{StaticResource SecondaryButton}" Command="{Binding CancelCommand}" Content="Annulla" />
+                        <Button Margin="0,0,10,0" Style="{StaticResource DangerButton}" Command="{Binding CancelCommand}" Content="Annulla" />
                         <Button Style="{StaticResource PrimaryButton}" Command="{Binding SynchronizeCommand}" Content="Sincronizza ora" />
                     </StackPanel>
                 </Grid>
@@ -302,7 +430,7 @@
                             <CheckBox Foreground="{DynamicResource PrimaryTextBrush}" Content="Avvia la sincronizzazione quando viene collegato l’SSD"
                                       IsChecked="{Binding SyncOnDriveConnected}" />
                             <CheckBox Margin="0,10,0,0" Foreground="{DynamicResource MirrorTextBrush}"
-                                      Content="Consenti anche Mirror automatico senza conferme a ogni collegamento"
+                                      Content="Consenti Mirror automatico senza conferme"
                                       IsChecked="{Binding AllowAutomaticMirror}" />
                             <StackPanel Margin="0,14,0,0" Orientation="Horizontal">
                                 <TextBlock Margin="0,0,12,0" VerticalAlignment="Center" Foreground="{DynamicResource SecondaryTextBrush}"
@@ -312,8 +440,36 @@
                                 <TextBlock Margin="9,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource SecondaryTextBrush}"
                                            Text="secondi" />
                             </StackPanel>
+                            <CheckBox Margin="0,18,0,0" Foreground="{DynamicResource PrimaryTextBrush}"
+                                      Content="Ripeti la sincronizzazione finché l’SSD è collegato"
+                                      IsChecked="{Binding SyncPeriodicallyWhileConnected}" />
+                            <StackPanel Margin="0,14,0,0" Orientation="Horizontal">
+                                <TextBlock Margin="0,0,12,0" VerticalAlignment="Center" Foreground="{DynamicResource SecondaryTextBrush}"
+                                           Text="Ogni:" />
+                                <ComboBox Width="110" Padding="10,8" ItemsSource="{Binding AvailablePeriodicSyncIntervals}"
+                                          SelectedItem="{Binding PeriodicSyncIntervalMinutes}" />
+                                <TextBlock Margin="9,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource SecondaryTextBrush}"
+                                           Text="minuti" />
+                            </StackPanel>
                             <TextBlock Margin="0,10,0,0" Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap"
-                                       Text="Funziona mentre DriveHarbor è aperto. Se l’SSD viene scollegato durante il countdown, l’avvio viene annullato. Mirror automatico esegue comunque l’anteprima tecnica, ma può eliminare file dalla destinazione senza altre conferme." />
+                                       Text="Le automazioni funzionano mentre DriveHarbor è aperto. Se l’SSD viene scollegato, gli avvii vengono annullati. Le ripetizioni non si sovrappongono a una sincronizzazione già in corso. Mirror automatico esegue comunque l’anteprima tecnica, ma può eliminare file dalla destinazione senza altre conferme." />
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,18">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Avvio e background" />
+                            <CheckBox Foreground="{DynamicResource PrimaryTextBrush}"
+                                      Content="Avvia DriveHarbor all’accesso a Windows"
+                                      IsChecked="{Binding RunAtWindowsStartup}" />
+                            <CheckBox Margin="0,10,0,0" Foreground="{DynamicResource PrimaryTextBrush}"
+                                      Content="Continua a funzionare in background quando chiudo la finestra"
+                                      IsChecked="{Binding KeepRunningInBackground}" />
+                            <CheckBox Margin="0,10,0,0" Foreground="{DynamicResource PrimaryTextBrush}"
+                                      Content="All’avvio da Windows, mostra solo l’icona nell’area di notifica"
+                                      IsChecked="{Binding StartMinimizedToTray}"
+                                      IsEnabled="{Binding RunAtWindowsStartup}" />
+                            <TextBlock Margin="0,10,0,0" Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap"
+                                       Text="L’avvio automatico vale per l’utente Windows corrente e non richiede privilegi amministrativi. Dal menu dell’icona puoi aprire DriveHarbor, sincronizzare o uscire completamente." />
                         </StackPanel>
                     </Border>
                     <Border Style="{StaticResource Card}" Margin="0,0,0,18">

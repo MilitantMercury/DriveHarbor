@@ -48,6 +48,11 @@ file esclusivamente dalla destinazione e deve essere usata solo con percorsi
 verificati e una copia indipendente dei dati. Configurazioni ambigue, percorsi
 annidati, junction e destinazioni esterne a OneDrive vengono rifiutati.
 
+L'avvio automatico è facoltativo e usa esclusivamente la chiave `Run` dell'utente
+corrente (`HKCU`), senza privilegi amministrativi. La voce contiene il percorso
+dell'eseguibile DriveHarbor e l'argomento `--background`; viene rimossa quando
+l'opzione viene disattivata.
+
 I log restano locali e non registrano il contenuto dei file. Possono comunque
 contenere nomi e percorsi: rimuovi queste informazioni prima di condividerli.
 L'esportazione dall'app include soltanto file `.log`, ma non anonimizza nomi e

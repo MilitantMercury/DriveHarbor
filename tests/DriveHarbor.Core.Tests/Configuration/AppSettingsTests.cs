@@ -16,6 +16,11 @@ public sealed class AppSettingsTests
         Assert.False(settings.SyncOnDriveConnected);
         Assert.False(settings.AllowAutomaticMirror);
         Assert.Equal(10, settings.DriveConnectedDelaySeconds);
+        Assert.False(settings.SyncPeriodicallyWhileConnected);
+        Assert.Equal(60, settings.PeriodicSyncIntervalMinutes);
+        Assert.False(settings.RunAtWindowsStartup);
+        Assert.True(settings.KeepRunningInBackground);
+        Assert.True(settings.StartMinimizedToTray);
         Assert.Contains("$RECYCLE.BIN", settings.Exclusions);
         Assert.Contains("System Volume Information", settings.Exclusions);
         Assert.Contains("*.tmp", settings.Exclusions);

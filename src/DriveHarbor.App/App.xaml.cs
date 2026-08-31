@@ -14,10 +14,11 @@ namespace DriveHarbor.App;
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App : Application, IDisposable
+public partial class App : System.Windows.Application, IDisposable
 {
     private MainViewModel? mainViewModel;
     private ThemeService? themeService;
+    private TrayIconService? trayIconService;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -36,10 +37,14 @@ public partial class App : Application, IDisposable
             themeService,
             new GitHubUpdateChecker(new HttpClient()),
             new VerifiedUpdateDownloader(new HttpClient(), AppPaths.UpdatesDirectory),
-            new SelfUpdateInstaller());
+            new SelfUpdateInstaller(),
+            new WindowsStartupRegistrationService());
 
-        var window = new MainWindow(mainViewModel);
+        var startedFromWindows = e.Args.Contains("--background", StringComparer.OrdinalIgnoreCase);
+        var window = new MainWindow(mainViewModel, startedFromWindows);
         MainWindow = window;
+        trayIconService = new(window, mainViewModel);
+        window.AttachTrayIcon(trayIconService);
         window.Show();
         ShowLastUpdateResult();
     }
@@ -71,6 +76,8 @@ public partial class App : Application, IDisposable
     {
         mainViewModel?.Dispose();
         mainViewModel = null;
+        trayIconService?.Dispose();
+        trayIconService = null;
         themeService?.Dispose();
         themeService = null;
         GC.SuppressFinalize(this);
