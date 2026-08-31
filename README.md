@@ -188,6 +188,9 @@ La pipeline GitHub Actions esegue restore, build, test e produce un artifact
 self-contained per Windows x64. Il pacchetto non usa ancora un installer o una
 firma Authenticode.
 
+Oltre a build e test, le correzioni dell'interfaccia che interessano l'avvio
+devono essere verificate eseguendo realmente la build pubblicata su Windows.
+
 I tag `v*` avviano un secondo workflow che crea archivio ZIP, checksum SHA-256,
 attestazione Sigstore della provenienza e GitHub Release in stato **draft**. I
 tag con suffisso, come `v1.1.0-beta.1`, vengono marcati come pre-release; i tag

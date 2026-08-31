@@ -186,7 +186,7 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <ProgressBar Height="8" VerticalAlignment="Center" Minimum="0" Maximum="100" Value="{Binding UpdateDownloadPercentage}" />
+                            <ProgressBar Height="8" VerticalAlignment="Center" Minimum="0" Maximum="100" Value="{Binding UpdateDownloadPercentage, Mode=OneWay}" />
                             <TextBlock Grid.Column="1" Margin="12,0,0,0" Foreground="White" Text="{Binding UpdateDownloadStatus}" />
                         </Grid>
                     </Grid>
