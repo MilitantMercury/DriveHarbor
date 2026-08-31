@@ -5,6 +5,8 @@ Il progetto segue il versionamento semantico.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-01
+
 ### Added
 
 - Sincronizzazione periodica configurabile mentre l'SSD resta collegato, senza esecuzioni sovrapposte.
