@@ -48,6 +48,11 @@ più lungo:
 
 La pagina Impostazioni confronta direttamente Backup e Mirror e chiarisce quali
 file restano o vengono eliminati dalla destinazione prima della selezione.
+Può inoltre avviare automaticamente Backup quando rileva il collegamento
+dell'SSD, dopo un ritardo configurabile tra 5 secondi e 10 minuti. Il countdown
+viene annullato se il supporto scompare. Mirror può essere autorizzato
+separatamente: esegue comunque l'anteprima tecnica, ma dopo il consenso iniziale
+può eliminare automaticamente dalla destinazione senza ulteriori conferme.
 L'aspetto può essere impostato su Sistema, Chiaro o Scuro. La modalità Sistema,
 predefinita, segue il tema delle app configurato in Windows anche mentre
 DriveHarbor è aperto.
