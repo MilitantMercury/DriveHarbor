@@ -6,7 +6,10 @@ public sealed class VerifiedUpdateDownloader(HttpClient httpClient, string updat
 {
     private const long MaximumPackageBytes = 250 * 1024 * 1024;
 
-    public async Task<UpdateDownloadResult> DownloadAsync(UpdateCheckResult update, CancellationToken cancellationToken = default)
+    public async Task<UpdateDownloadResult> DownloadAsync(
+        UpdateCheckResult update,
+        IProgress<UpdateDownloadProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
         if (!update.IsAvailable || update.Version is null || update.PackageUri is null || update.ChecksumUri is null)
             return new(false, "La release non contiene pacchetto e checksum richiesti.");
@@ -26,8 +29,15 @@ public sealed class VerifiedUpdateDownloader(HttpClient httpClient, string updat
             await using (var source = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false))
             await using (var destination = new FileStream(temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 81920, true))
             {
-                await source.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
-                if (destination.Length > MaximumPackageBytes) return new(false, "Il pacchetto supera la dimensione massima consentita.");
+                var buffer = new byte[81920];
+                int bytesRead;
+                while ((bytesRead = await source.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
+                {
+                    await destination.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken).ConfigureAwait(false);
+                    if (destination.Length > MaximumPackageBytes)
+                        return new(false, "Il pacchetto supera la dimensione massima consentita.");
+                    progress?.Report(new(destination.Length, response.Content.Headers.ContentLength));
+                }
             }
             var actualHash = Convert.ToHexString(SHA256.HashData(await File.ReadAllBytesAsync(temporaryPath, cancellationToken))).ToLowerInvariant();
             if (!CryptographicOperations.FixedTimeEquals(Convert.FromHexString(expectedHash), Convert.FromHexString(actualHash)))

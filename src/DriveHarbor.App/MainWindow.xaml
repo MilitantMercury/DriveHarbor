@@ -171,11 +171,25 @@
 
                 <Border Grid.Row="2" Margin="0,0,0,18" Padding="16" CornerRadius="8" Background="#1677FF"
                         Visibility="{Binding UpdateVisibility}">
-                    <DockPanel>
-                        <Button DockPanel.Dock="Right" Margin="16,0,0,0" Style="{StaticResource SecondaryButton}"
-                                Command="{Binding DownloadUpdateCommand}" Content="Scarica e verifica" />
-                        <TextBlock VerticalAlignment="Center" Foreground="White" FontWeight="SemiBold" Text="{Binding UpdateMessage}" />
-                    </DockPanel>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Margin="16,0,0,0" Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding DownloadUpdateCommand}" Content="Scarica e verifica" />
+                            <TextBlock VerticalAlignment="Center" Foreground="White" FontWeight="SemiBold" Text="{Binding UpdateMessage}" />
+                        </DockPanel>
+                        <Grid Grid.Row="1" Margin="0,12,0,0" Visibility="{Binding UpdateDownloadProgressVisibility}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ProgressBar Height="8" VerticalAlignment="Center" Minimum="0" Maximum="100" Value="{Binding UpdateDownloadPercentage}" />
+                            <TextBlock Grid.Column="1" Margin="12,0,0,0" Foreground="White" Text="{Binding UpdateDownloadStatus}" />
+                        </Grid>
+                    </Grid>
                 </Border>
 
                 <Border Grid.Row="3" Style="{StaticResource Card}" Margin="0,0,0,18">

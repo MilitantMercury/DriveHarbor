@@ -15,12 +15,16 @@ public sealed class VerifiedUpdateDownloaderTests
         var hash = Convert.ToHexString(SHA256.HashData(package)).ToLowerInvariant();
         using var client = CreateClient(package, $"{hash}  DriveHarbor-v1.1.0-win-x64.zip");
         var downloader = new VerifiedUpdateDownloader(client, directory.FullPath);
+        var reports = new List<UpdateDownloadProgress>();
 
-        var result = await downloader.DownloadAsync(CreateUpdate());
+        var result = await downloader.DownloadAsync(CreateUpdate(), new InlineProgress<UpdateDownloadProgress>(reports.Add));
 
         Assert.True(result.Succeeded);
         Assert.Equal(package, await File.ReadAllBytesAsync(result.PackagePath!));
         Assert.Empty(Directory.EnumerateFiles(directory.FullPath, "*.tmp"));
+        var finalProgress = Assert.Single(reports);
+        Assert.Equal(package.Length, finalProgress.BytesReceived);
+        Assert.Equal(100, finalProgress.Percentage);
     }
 
     [Fact]
@@ -52,5 +56,10 @@ public sealed class VerifiedUpdateDownloaderTests
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
             Task.FromResult(responseFactory(request));
+    }
+
+    private sealed class InlineProgress<T>(Action<T> report) : IProgress<T>
+    {
+        public void Report(T value) => report(value);
     }
 }
