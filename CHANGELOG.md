@@ -5,6 +5,8 @@ Il progetto segue il versionamento semantico.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-06
+
 ### Changed
 
 - Nelle impostazioni Mirror è presentato in verde come modalità consigliata, mentre Backup è evidenziato in rosso.
