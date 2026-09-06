@@ -35,6 +35,7 @@ Consulta la [roadmap](docs/roadmap.md) per la sequenza prevista.
 ## Interfaccia
 
 La dashboard mostra stato SSD e OneDrive, modalità, ultima sincronizzazione,
+avanzamento globale dei file da copiare e tempo residuo stimato,
 ultimo risultato e un riepilogo leggibile dell'attività. Al termine indica file
 esaminati, aggiunti o aggiornati, già sincronizzati, eliminati ed eventuali
 errori; il log tecnico completo resta disponibile nei file locali. Il pulsante

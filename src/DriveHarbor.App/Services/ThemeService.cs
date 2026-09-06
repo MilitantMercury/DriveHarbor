@@ -102,10 +102,10 @@ public sealed class ThemeService : IThemeService, IDisposable
         SetBrush("DangerButtonBrush", dark ? "#B9383E" : "#C93434");
         SetBrush("DangerButtonHoverBrush", dark ? "#D04A50" : "#A92525");
         SetBrush("SecondaryButtonTextBrush", dark ? "#DCE7F1" : "#24384F");
-        SetBrush("BackupPanelBrush", dark ? "#173426" : "#EAF7EF");
-        SetBrush("BackupTextBrush", dark ? "#8ED8AE" : "#17633A");
-        SetBrush("MirrorPanelBrush", dark ? "#3A251A" : "#FFF1E8");
-        SetBrush("MirrorTextBrush", dark ? "#F1B48D" : "#8A3D12");
+        SetBrush("BackupPanelBrush", dark ? "#3B2022" : "#FDECEC");
+        SetBrush("BackupTextBrush", dark ? "#F2A4A4" : "#9B2525");
+        SetBrush("MirrorPanelBrush", dark ? "#173426" : "#E8F7EE");
+        SetBrush("MirrorTextBrush", dark ? "#8ED8AE" : "#17633A");
         SetBrush("AvailablePanelBrush", dark ? "#173426" : "#E8F7EE");
         SetBrush("AvailableBorderBrush", dark ? "#3F815A" : "#75C794");
         SetBrush("AvailableTextBrush", dark ? "#8ED8AE" : "#17633A");

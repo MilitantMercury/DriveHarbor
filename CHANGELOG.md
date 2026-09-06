@@ -5,6 +5,14 @@ Il progetto segue il versionamento semantico.
 
 ## [Unreleased]
 
+### Changed
+
+- Nelle impostazioni Mirror è presentato in verde come modalità consigliata, mentre Backup è evidenziato in rosso.
+
+### Added
+
+- Barra di avanzamento globale durante la sincronizzazione, calcolata tramite un'analisi preventiva, con file completati, percentuale complessiva e tempo residuo stimato.
+
 ## [1.1.0] - 2026-09-01
 
 ### Added

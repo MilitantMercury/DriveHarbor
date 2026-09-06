@@ -119,6 +119,19 @@ public sealed class SynchronizationServiceTests
         Assert.False(context.Runner.LastRequest?.MirrorConfirmed);
     }
 
+    [Fact]
+    public async Task BackupAnalysisCalculatesWorkWithoutModifyingFiles()
+    {
+        using var context = CreateValidContext(SyncMode.Backup);
+
+        var result = await context.Service.AnalyzeAsync(context.Settings);
+
+        Assert.Equal(SynchronizationStatus.Completed, result.Status);
+        Assert.Equal(SyncMode.Backup, context.Runner.LastRequest?.Mode);
+        Assert.True(context.Runner.LastRequest?.DryRun);
+        Assert.False(context.Runner.LastRequest?.MirrorConfirmed);
+    }
+
     private static ValidContext CreateValidContext(SyncMode mode)
     {
         var temporaryDirectory = new TemporaryDirectory();

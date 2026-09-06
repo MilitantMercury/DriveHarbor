@@ -116,6 +116,20 @@ public sealed class ProjectConventionsTests
         Assert.Contains("--background", startupService, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void SettingsPresentMirrorAsTheRecommendedMode()
+    {
+        var repositoryRoot = FindRepositoryRoot();
+        var xaml = File.ReadAllText(Path.Combine(repositoryRoot, "src", "DriveHarbor.App", "MainWindow.xaml"));
+        var themeService = File.ReadAllText(Path.Combine(
+            repositoryRoot, "src", "DriveHarbor.App", "Services", "ThemeService.cs"));
+
+        Assert.Contains("Text=\"Mirror — consigliato\"", xaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("Backup — consigliato", xaml, StringComparison.Ordinal);
+        Assert.Contains("SetBrush(\"MirrorPanelBrush\", dark ? \"#173426\" : \"#E8F7EE\")", themeService, StringComparison.Ordinal);
+        Assert.Contains("SetBrush(\"BackupPanelBrush\", dark ? \"#3B2022\" : \"#FDECEC\")", themeService, StringComparison.Ordinal);
+    }
+
     private static string FindRepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);

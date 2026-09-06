@@ -17,6 +17,8 @@ public sealed class RobocopyCommandBuilderTests
         Assert.DoesNotContain("/L", arguments);
         Assert.Contains("/XJ", arguments);
         Assert.Contains("/R:2", arguments);
+        Assert.Contains("/ETA", arguments);
+        Assert.DoesNotContain("/NP", arguments);
     }
 
     [Fact]

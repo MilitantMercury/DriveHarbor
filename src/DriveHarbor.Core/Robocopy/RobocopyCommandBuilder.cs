@@ -33,7 +33,7 @@ public static class RobocopyCommandBuilder
             "/W:2",
             "/Z",
             "/XJ",
-            "/NP",
+            "/ETA",
             "/BYTES",
         };
 
