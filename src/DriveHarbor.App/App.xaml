@@ -20,10 +20,10 @@
         <SolidColorBrush x:Key="DangerButtonBrush" Color="#C93434" />
         <SolidColorBrush x:Key="DangerButtonHoverBrush" Color="#A92525" />
         <SolidColorBrush x:Key="SecondaryButtonTextBrush" Color="#24384F" />
-        <SolidColorBrush x:Key="BackupPanelBrush" Color="#EAF7EF" />
-        <SolidColorBrush x:Key="BackupTextBrush" Color="#17633A" />
-        <SolidColorBrush x:Key="MirrorPanelBrush" Color="#FFF1E8" />
-        <SolidColorBrush x:Key="MirrorTextBrush" Color="#8A3D12" />
+        <SolidColorBrush x:Key="BackupPanelBrush" Color="#FDECEC" />
+        <SolidColorBrush x:Key="BackupTextBrush" Color="#9B2525" />
+        <SolidColorBrush x:Key="MirrorPanelBrush" Color="#E8F7EE" />
+        <SolidColorBrush x:Key="MirrorTextBrush" Color="#17633A" />
         <SolidColorBrush x:Key="AvailablePanelBrush" Color="#E8F7EE" />
         <SolidColorBrush x:Key="AvailableBorderBrush" Color="#75C794" />
         <SolidColorBrush x:Key="AvailableTextBrush" Color="#17633A" />

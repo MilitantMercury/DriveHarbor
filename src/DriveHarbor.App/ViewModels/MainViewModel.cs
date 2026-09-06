@@ -46,6 +46,14 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private double updateDownloadPercentage;
     private string updateDownloadStatus = string.Empty;
     private bool isDownloadingUpdate;
+    private double synchronizationProgressPercentage;
+    private string synchronizationProgressStatus = "Preparazione…";
+    private bool isSynchronizationProgressVisible;
+    private bool isSynchronizationProgressIndeterminate = true;
+    private long? synchronizationFilesToCopy;
+    private long synchronizationFilesCompleted;
+    private DateTimeOffset synchronizationCopyStartedUtc;
+    private bool currentProgressFileCompleted;
     private string exclusionsText = string.Empty;
     private string logDirectory = AppPaths.DefaultLogDirectory;
     private string ssdStatus = "Non configurato";
@@ -173,6 +181,27 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     public Visibility UpdateDownloadProgressVisibility =>
         isDownloadingUpdate ? Visibility.Visible : Visibility.Collapsed;
+
+    public double SynchronizationProgressPercentage
+    {
+        get => synchronizationProgressPercentage;
+        private set => SetProperty(ref synchronizationProgressPercentage, value);
+    }
+
+    public string SynchronizationProgressStatus
+    {
+        get => synchronizationProgressStatus;
+        private set => SetProperty(ref synchronizationProgressStatus, value);
+    }
+
+    public bool IsSynchronizationProgressIndeterminate
+    {
+        get => isSynchronizationProgressIndeterminate;
+        private set => SetProperty(ref isSynchronizationProgressIndeterminate, value);
+    }
+
+    public Visibility SynchronizationProgressVisibility =>
+        isSynchronizationProgressVisible ? Visibility.Visible : Visibility.Collapsed;
 
     public bool SyncOnDriveConnected
     {
@@ -560,6 +589,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         LogLines.Clear();
         synchronizationCancellation = new();
         synchronizationCancellationReason = SynchronizationCancellationReason.None;
+        StartSynchronizationProgress("Preparazione della sincronizzazione…");
+        var progress = new Progress<string>(UpdateSynchronizationProgress);
 
         try
         {
@@ -573,6 +604,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
                 robocopyRunner,
                 logger);
 
+            SynchronizationResult analysis;
+
             if (savedSettings.Mode == SyncMode.Mirror)
             {
                 if (!automatic && !userDialog.Confirm(
@@ -584,6 +617,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
                 OperationStatus = "Analisi Mirror in corso";
                 AppendLogLine("Anteprima Mirror in corso…");
+                ResetSynchronizationProgress("Analisi dei file per Mirror…");
                 var preview = await service.PreviewMirrorAsync(
                     savedSettings,
                     progress: null,
@@ -601,6 +635,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
                     return;
                 }
 
+                analysis = preview;
+
                 if (!automatic && !userDialog.Confirm(
                     "Conferma Mirror",
                     "L'anteprima è completata. Mirror può eliminare file soltanto dalla destinazione. Vuoi eseguire ora la sincronizzazione?"))
@@ -609,15 +645,33 @@ public sealed class MainViewModel : ObservableObject, IDisposable
                     return;
                 }
             }
+            else
+            {
+                OperationStatus = "Analisi Backup in corso";
+                AppendLogLine("Calcolo dei file da sincronizzare…");
+                ResetSynchronizationProgress("Calcolo del lavoro totale…");
+                analysis = await service.AnalyzeAsync(
+                    savedSettings,
+                    synchronizationCancellation.Token);
+                analysis = DescribeCancellationReason(analysis);
+                if (analysis.Status is not SynchronizationStatus.Completed
+                    and not SynchronizationStatus.CompletedWithWarnings)
+                {
+                    ApplySynchronizationResult(analysis, persistHistory: false);
+                    AppendFriendlySummary(analysis, isPreview: true);
+                    return;
+                }
+            }
 
             OperationStatus = "Sincronizzazione in corso";
+            BeginGlobalCopyProgress(analysis.Summary?.CopiedFiles);
             AppendLogLine(savedSettings.Mode == SyncMode.Mirror
                 ? "Sincronizzazione Mirror in corso…"
                 : "Backup in corso…");
             var result = await service.SynchronizeAsync(
                 savedSettings,
                 mirrorConfirmed: savedSettings.Mode == SyncMode.Mirror,
-                progress: null,
+                progress,
                 synchronizationCancellation.Token);
             result = DescribeCancellationReason(result);
             if (result.Status == SynchronizationStatus.SourceDisconnected)
@@ -634,6 +688,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             synchronizationCancellation = null;
             synchronizationCancellationReason = SynchronizationCancellationReason.None;
             IsBusy = false;
+            StopSynchronizationProgress();
             ResetPeriodicScheduleFromNow();
             RefreshAvailability();
         }
@@ -871,6 +926,98 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
         LogLines.Add(line);
     }
+
+    private void StartSynchronizationProgress(string status)
+    {
+        isSynchronizationProgressVisible = true;
+        OnPropertyChanged(nameof(SynchronizationProgressVisibility));
+        ResetSynchronizationProgress(status);
+    }
+
+    private void ResetSynchronizationProgress(string status)
+    {
+        SynchronizationProgressPercentage = 0;
+        SynchronizationProgressStatus = status;
+        IsSynchronizationProgressIndeterminate = true;
+    }
+
+    private void UpdateSynchronizationProgress(string line)
+    {
+        if (!RobocopyProgressParser.TryParse(line, out var progress) || progress is null)
+        {
+            if (currentProgressFileCompleted && !string.IsNullOrWhiteSpace(line))
+            {
+                currentProgressFileCompleted = false;
+            }
+            return;
+        }
+
+        if (synchronizationFilesToCopy is not > 0)
+        {
+            SynchronizationProgressStatus = "Sincronizzazione in corso; conteggio globale non disponibile";
+            return;
+        }
+
+        if (progress.Percentage < 99.95)
+        {
+            currentProgressFileCompleted = false;
+        }
+
+        if (progress.Percentage >= 99.95
+            && !currentProgressFileCompleted
+            && synchronizationFilesCompleted < synchronizationFilesToCopy.Value)
+        {
+            synchronizationFilesCompleted++;
+            currentProgressFileCompleted = true;
+        }
+
+        var fractionalFile = progress.Percentage >= 99.95 ? 0 : progress.Percentage / 100;
+        var completedEquivalent = Math.Min(
+            synchronizationFilesToCopy.Value,
+            synchronizationFilesCompleted + fractionalFile);
+        SynchronizationProgressPercentage = completedEquivalent / synchronizationFilesToCopy.Value * 100;
+        IsSynchronizationProgressIndeterminate = false;
+
+        var status = $"{synchronizationFilesCompleted:N0} di {synchronizationFilesToCopy.Value:N0} file · {SynchronizationProgressPercentage:N0}%";
+        if (synchronizationFilesCompleted > 0)
+        {
+            var elapsed = DateTimeOffset.UtcNow - synchronizationCopyStartedUtc;
+            var estimatedTotalSeconds = elapsed.TotalSeconds
+                / synchronizationFilesCompleted
+                * synchronizationFilesToCopy.Value;
+            var remaining = TimeSpan.FromSeconds(Math.Max(0, estimatedTotalSeconds - elapsed.TotalSeconds));
+            status += $" · tempo stimato {FormatDuration(remaining)}";
+        }
+
+        SynchronizationProgressStatus = status;
+    }
+
+    private void BeginGlobalCopyProgress(long? filesToCopy)
+    {
+        synchronizationFilesToCopy = filesToCopy;
+        synchronizationFilesCompleted = 0;
+        currentProgressFileCompleted = false;
+        synchronizationCopyStartedUtc = DateTimeOffset.UtcNow;
+        SynchronizationProgressPercentage = filesToCopy == 0 ? 100 : 0;
+        IsSynchronizationProgressIndeterminate = filesToCopy is null;
+        SynchronizationProgressStatus = filesToCopy switch
+        {
+            null => "Sincronizzazione in corso; conteggio globale non disponibile",
+            0 => "Nessun file da copiare",
+            _ => $"0 di {filesToCopy.Value:N0} file · 0%",
+        };
+    }
+
+    private void StopSynchronizationProgress()
+    {
+        isSynchronizationProgressVisible = false;
+        OnPropertyChanged(nameof(SynchronizationProgressVisibility));
+    }
+
+    private static string FormatDuration(TimeSpan duration) =>
+        duration.TotalHours >= 1
+            ? $"{(int)duration.TotalHours}:{duration.Minutes:00}:{duration.Seconds:00}"
+            : $"{duration.Minutes}:{duration.Seconds:00}";
 
     private void AppendFriendlySummary(SynchronizationResult result, bool isPreview)
     {

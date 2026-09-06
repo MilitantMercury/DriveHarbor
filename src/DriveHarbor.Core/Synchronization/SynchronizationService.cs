@@ -50,6 +50,19 @@ public sealed class SynchronizationService
             cancellationToken).ConfigureAwait(false);
     }
 
+    public Task<SynchronizationResult> AnalyzeAsync(
+        AppSettings settings,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        return RunCoreAsync(
+            settings,
+            dryRun: true,
+            mirrorConfirmed: false,
+            progress: null,
+            cancellationToken);
+    }
+
     public Task<SynchronizationResult> SynchronizeAsync(
         AppSettings settings,
         bool mirrorConfirmed,
@@ -106,7 +119,7 @@ public sealed class SynchronizationService
             cancellationToken).ConfigureAwait(false);
 
         await PersistProcessLogAsync(result, CancellationToken.None).ConfigureAwait(false);
-        return MapResult(result, dryRun);
+        return MapResult(result, dryRun, settings.Mode);
     }
 
     private PreflightResult Preflight(AppSettings settings)
@@ -182,7 +195,10 @@ public sealed class SynchronizationService
             cancellationToken).ConfigureAwait(false);
     }
 
-    private static SynchronizationResult MapResult(RobocopyResult result, bool dryRun)
+    private static SynchronizationResult MapResult(
+        RobocopyResult result,
+        bool dryRun,
+        SyncMode mode)
     {
         var status = result.Status switch
         {
@@ -192,7 +208,9 @@ public sealed class SynchronizationService
             _ => SynchronizationStatus.Error,
         };
         var message = dryRun && status is SynchronizationStatus.Completed or SynchronizationStatus.CompletedWithWarnings
-            ? "Anteprima completata. Controlla il log prima di confermare Mirror."
+            ? mode == SyncMode.Mirror
+                ? "Anteprima completata. Controlla il log prima di confermare Mirror."
+                : "Analisi completata. DriveHarbor ha calcolato i file da sincronizzare."
             : result.UserMessage;
         return new(status, message, result.Summary, result.Output);
     }

@@ -322,6 +322,10 @@
 
                 <Border Grid.Row="3" Style="{StaticResource Card}" Margin="0,0,0,18">
                     <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*" />
                             <ColumnDefinition Width="*" />
@@ -339,6 +343,19 @@
                             <TextBlock Foreground="{DynamicResource MutedTextBrush}" Text="ULTIMO RISULTATO" />
                             <TextBlock Margin="0,7,0,0" Foreground="{DynamicResource PrimaryTextBrush}" TextWrapping="Wrap" Text="{Binding LastResult}" />
                         </StackPanel>
+                        <Grid Grid.Row="1" Grid.ColumnSpan="3" Margin="0,18,0,0"
+                              Visibility="{Binding SynchronizationProgressVisibility}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <ProgressBar Height="10" Minimum="0" Maximum="100"
+                                         IsIndeterminate="{Binding IsSynchronizationProgressIndeterminate}"
+                                         Value="{Binding SynchronizationProgressPercentage, Mode=OneWay}" />
+                            <TextBlock Grid.Row="1" Margin="0,7,0,0"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       Text="{Binding SynchronizationProgressStatus}" />
+                        </Grid>
                     </Grid>
                 </Border>
 
@@ -393,21 +410,21 @@
                                 </Grid.ColumnDefinitions>
                                 <Border Padding="14" Background="{DynamicResource BackupPanelBrush}" CornerRadius="7">
                                     <StackPanel>
-                                        <TextBlock Foreground="{DynamicResource BackupTextBrush}" FontWeight="SemiBold" Text="Backup — consigliato" />
+                                        <TextBlock Foreground="{DynamicResource BackupTextBrush}" FontWeight="SemiBold" Text="Backup" />
                                         <TextBlock Margin="0,7,0,0" Foreground="{DynamicResource BackupTextBrush}" TextWrapping="Wrap"
                                                    Text="Copia i file nuovi e aggiornati dall’SSD. I file presenti soltanto su OneDrive rimangono al loro posto." />
                                     </StackPanel>
                                 </Border>
                                 <Border Grid.Column="2" Padding="14" Background="{DynamicResource MirrorPanelBrush}" CornerRadius="7">
                                     <StackPanel>
-                                        <TextBlock Foreground="{DynamicResource MirrorTextBrush}" FontWeight="SemiBold" Text="Mirror — attenzione" />
+                                        <TextBlock Foreground="{DynamicResource MirrorTextBrush}" FontWeight="SemiBold" Text="Mirror — consigliato" />
                                         <TextBlock Margin="0,7,0,0" Foreground="{DynamicResource MirrorTextBrush}" TextWrapping="Wrap"
                                                    Text="Rende OneDrive identico all’SSD. I file presenti soltanto nella destinazione vengono eliminati dopo anteprima e conferma." />
                                     </StackPanel>
                                 </Border>
                             </Grid>
                             <TextBlock Margin="0,11,0,0" Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap"
-                                       Text="DriveHarbor non elimina mai file dalla sorgente SSD. Usa Mirror solo se disponi di un’altra copia dei dati." />
+                                       Text="DriveHarbor non elimina mai file dalla sorgente SSD. Mirror mantiene la destinazione identica alla sorgente; Backup conserva anche i file presenti soltanto nella destinazione." />
                             <TextBlock Margin="0,20,0,7" Style="{StaticResource FieldLabel}" Text="Esclusioni (un pattern o una cartella per riga)" />
                             <TextBox MinHeight="110" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Style="{StaticResource TextField}"
                                      Text="{Binding ExclusionsText, UpdateSourceTrigger=PropertyChanged}" />
